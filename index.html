@@ -1,0 +1,2939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Vocab Master</title>
+    <meta name="description" content="Personal French Vocabulary App">
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Hide scrollbar for clean look */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .perspective-1000 { perspective: 1000px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // 2. Setup React tools
+        const { useState, useEffect, useMemo } = React;
+
+        // 3. Your Full Vocabulary Data
+        const RAW_VOCAB_DATA = `
+# French Vocabulary Study Guide
+
+## 1. Physical Descriptions (La Description Physique)
+
+### La Taille (Height/Size)
+Je suis grand(e) - I am tall
+Je suis petit(e) - I am short/small
+Je suis de taille moyenne - I am of average height
+Je mesure 1 mètre 80 - I am 1 metre 80 tall
+
+### Les Yeux (Eyes)
+J'ai les yeux bleus - I have blue eyes
+J'ai les yeux verts - I have green eyes
+J'ai les yeux marron - I have brown eyes
+Je porte des lunettes - I wear glasses
+Je porte des lentilles - I wear contact lenses
+
+### Les Cheveux (Hair)
+J'ai les cheveux noirs - I have black hair
+J'ai les cheveux blonds - I have blonde hair
+J'ai les cheveux roux - I have ginger/red hair
+J'ai les cheveux châtains - I have chestnut/brown hair
+J'ai les cheveux courts et bouclés - I have short and curly hair
+J'ai les cheveux longs et raides - I have long and straight hair
+
+### Phrases Idiomatiques (Physical)
+Tout le monde dit que je ressemble à mon père/à ma mère - Everyone says I look like my dad/my mum
+Je suis le portrait craché de mon frère/ma sœur - I'm the spitting image of my brother/my sister
+
+## 2. Personality (La Personnalité)
+
+### Qualités (Positive Traits)
+Amical(e) - Friendly
+Bavard(e) - Chatty
+Compréhensif(ive) - Understanding
+Drôle - Funny
+Gentil(le) - Kind
+Heureux(se) - Happy
+Intéressant(e) - Interesting
+Mûr(e) - Mature
+Patient(e) - Patient
+Sociable - Sociable
+Sympa - Nice/Friendly
+Travailleur(se) - Hard-working
+
+### Défauts (Negative Traits)
+Égoïste - Selfish
+Énervant(e) - Annoying
+Ennuyeux(se) - Boring
+Fainéant(e) - Lazy
+Froid(e) - Unfriendly/Cold
+Gamin(e) - Childish
+Gâté(e) - Spoilt
+Impulsif(ive) - Impulsive
+Impatient(e) - Impatient
+Maladroit(e) - Clumsy
+Méchant(e) - Mean/Nasty
+Paresseux(se) - Lazy
+Têtu(e) - Stubborn
+Timide - Shy
+
+### Phrases Idiomatiques (Personality)
+Il/elle a un cœur d’or - He/she has a heart of gold
+Il/elle est dans la lune - He/she is a daydreamer
+Il/elle a la tête dans les nuages - He/she has his/her head in the clouds
+Il/elle a la tête sur les épaules - He/she is level-headed
+
+## 3. Family Members (Les membres de la famille)
+
+### Masculine (Le)
+Père - Father
+Frère - Brother
+Grand-père - Grandfather
+Beau-père - Step-father / Father-in-law
+Jumeau - Twin (male)
+Cousin - Cousin (male)
+Fils - Son
+Petit-fils - Grandson
+Demi-frère - Half-brother / Step-brother
+Oncle - Uncle
+Neveu - Nephew
+
+### Feminine (La)
+Mère - Mother
+Sœur - Sister
+Grand-mère - Grandmother
+Belle-mère - Step-mother / Mother-in-law
+Jumelle - Twin (female)
+Cousine - Cousin (female)
+Fille - Daughter
+Petite-fille - Granddaughter
+Demi-sœur - Half-sister / Step-sister
+Tante - Aunt
+Nièce - Niece
+
+### Plural (Les)
+Parents - Parents
+Frangins/frangines (fam.) - Brothers/sisters (slang)
+Grands-parents - Grandparents
+Beaux-parents - Step-parents / Parents-in-law
+Jumeaux/jumelles - Twins
+Cousins/cousines - Cousins
+Enfants - Children
+Petits-enfants - Grandchildren
+
+### Expanded Family Terms
+L'enfance (f.) - Childhood
+L'aîné(e) - The eldest
+Le cadet/la cadette - The youngest
+Les arrière-grands-parents - Great-grandparents
+Le parrain - Godfather
+La marraine - Godmother
+Un filleul - Godson
+Une filleule - Goddaughter
+Un veuf - Widower
+Une veuve - Widow
+Un(e) orphelin(e) - Orphan
+Un tuteur/une tutrice - Guardian
+Un enfant adoptif - Adopted child
+Des parents adoptifs - Adoptive parents
+Le mariage - Marriage
+Épouser quelqu'un - To marry somebody
+Le mari - Husband
+La femme/l'épouse - Wife
+Une mère célibataire - Single mother
+Un père célibataire - Single father
+La belle-famille - In-laws
+Un beau-frère - Brother-in-law
+Une belle-sœur - Sister-in-law
+Se séparer - To separate
+Un divorce - A divorce
+Divorcer - To get divorced
+
+## 4. Family Relationships & Conflicts
+
+### Les Bons Rapports (Good Relationships)
+S'entendre bien avec quelqu'un - To get on well with someone
+S'entendre à merveille avec quelqu'un - To get on wonderfully with someone
+Avoir de bons rapports avec quelqu'un - To have a good relationship with someone
+Aimer/adorer quelqu'un - To love/adore someone
+Avoir les mêmes goûts que quelqu'un - To have the same tastes as someone
+
+### Les Mauvais Rapports (Bad Relationships)
+Ne pas s'entendre du tout avec quelqu'un - To not get on with someone at all
+Ne pas supporter quelqu'un - To not be able to stand someone
+Détester quelqu'un - To hate someone
+Être difficile à vivre - To be difficult to live with
+
+### Le Soutien Familial (Family Support)
+Avoir confiance en quelqu'un - To trust someone
+Être toujours là pour quelqu'un - To always be there for someone
+Traiter quelqu'un comme un(e) adulte - To treat someone like an adult
+Se sentir aimé(e) - To feel loved
+
+### Les Disputes (Arguments)
+Se disputer with quelqu'un - To argue with someone
+C'est la guerre entre nous deux - It’s war between the two of us
+Ça m'énerve quand... - It annoys me when...
+Rendre quelqu'un fou/folle - To drive someone crazy
+
+### Phrases Idiomatiques (Relationships)
+Je me dispute beaucoup avec mon frère, mais je sais qu'il est toujours là pour moi - I argue a lot with my brother, but I know that he is always there for me
+Je suis très proche de ma sœur - I am very close to my sister
+Nous sommes une famille très unie - We are a close family
+Nous sommes comme le jour et la nuit - We are like day and night (chalk and cheese)
+Nous faisons bon ménage - We get on really well (like a house on fire)
+Il/elle me tape sur les nerfs - He/she gets on my nerves
+
+## 5. The Generation Gap (Le conflit des générations)
+
+### La faute des parents (The parents' fault)
+Sont trop stricts/sévères - Are too strict/severe
+Sont démodés/grincheux - Are old-fashioned/grumpy
+Ne comprennent pas la pression de la vie moderne - Don't understand the pressure of modern life
+N'ont pas assez de temps à consacrer à leurs enfants - Don't have enough time to give to their children
+Refusent d'accorder une grande liberté aux adolescents - Refuse to give a lot of freedom to teenagers
+
+### La faute des adolescents (The teenagers' fault)
+Sont têtus/paresseux - Are stubborn/lazy
+Sont intolérants/égoïstes - Are intolerant/selfish
+Refusent d'accepter les conseils de leurs parents ou professeurs - Refuse to accept advice from parents or teachers
+Sont souvent irrespectueux envers les personnes plus âgées - Are often disrespectful towards older people
+Ne sont pas conscients des dangers présents dans la société moderne - Are not aware of the dangers in modern society
+
+### Les problèmes (The problems)
+Une divergence de points de vue qui mène aux disputes - A difference in opinion which leads to arguments
+Une différence de valeurs entre des personnes de générations différentes - A difference in values between people of different generations
+Travailler à plein-temps et élever des enfants est difficile - Working full-time and raising children is difficult
+Les dangers qui menacent les jeunes aujourd'hui sont de plus en plus nombreux - The dangers threatening young people today are increasing
+Trop de liberté peut conduire les jeunes à la délinquance (l'alcool, les graffitis et la drogue) - Too much freedom can lead young people to delinquency (alcohol, graffiti, and drugs)
+
+### Les solutions (The solutions)
+Il faut dialoguer/communiquer - You must talk/communicate
+Comprendre l'importance de trouver un compromis - Understand the importance of finding a compromise
+Essayer de passer plus de temps ensemble - Try to spend more time together
+Partager de bons moments en famille - Share good times as a family
+Apprendre à être plus tolérants et respectueux les uns envers les autres - Learn to be more tolerant and respectful towards each other
+
+## 6. Chores (Les tâches ménagères)
+
+### Le Ménage (Cleaning)
+Débarrasser la table - Clear the table
+Donner à manger au chien - Feed the dog
+Faire du bricolage - Do DIY
+Faire des courses - Go shopping
+Faire la cuisine - Cook
+Faire du jardinage - Gardening
+Faire la lessive - Do the washing/laundry
+Faire le lit - Make the bed
+Faire du repassage - Do the ironing
+Laver la voiture - Wash the car
+Mettre le couvert - Set the table
+Passer l’aspirateur - Vacuum
+Passer le balai - Sweep
+Ranger la chambre - Tidy the bedroom
+Remplir/vider le lave-vaisselle - Load/empty the dishwasher
+Tondre la pelouse - Mow the lawn
+
+### Phrases Idiomatiques (Chores)
+Chez nous, on se partage le travail, on forme une bonne équipe - At our house, we share the work – we work as a team
+Nous faisons tous un effort - We all pull together
+Tout le monde donne un coup de main - Everyone chips in
+Ma chambre est toujours en bazar ! - My bedroom is always messy!
+Je suis maniaque – je ne peux pas supporter le désordre - I am a neat freak – I can’t handle mess!
+
+## 7. Housing (Le logement)
+
+### Les maisons et appartements (Houses)
+Une maison jumelée - A semi-detached house
+Une maison individuelle/un pavillon - A detached house
+Une maison de plain-pied - A single-storey house
+Un appartement - An apartment
+Un immeuble - An apartment block, a building
+Une HLM (habitation à loyer modéré) - Social housing
+Le gratte-ciel - Skyscraper
+Le lotissement - Housing estate
+Une agence immobilière - Estate agency
+
+### Les endroits (Locations)
+La banlieue - Suburbs
+Le lotissement - Housing estate
+Le centre-ville - City centre
+L’arrondissement - District
+La campagne - Countryside
+Le village - Village
+
+### Les pièces et structures (Rooms)
+L’entrée - Entryway
+La cuisine - Kitchen
+La salle à manger - Dining room
+La salle de bains - Bathroom
+La salle de séjour/le salon - Living room/lounge
+Le bureau - Office / study
+La chambre (à coucher) - Bedroom
+La buanderie - Laundry room
+Le grenier - Attic
+La cave - Cellar
+Le sous-sol - Basement
+Le jardin - Garden
+Un étage - Floor
+Le rez-de-chaussée - Ground floor
+Le premier étage - First floor
+En bas - Downstairs
+En haut - Upstairs
+Un escalier - Stairs
+Les toilettes (f.) - Toilet
+Une baignoire - Bath
+Un lavabo - Wash-hand basin
+Le couloir - Corridor
+La terrasse - Patio / terrace
+Le balcon - Balcony
+Le toit - Roof
+La cheminée - Fireplace
+Le plafond - Ceiling
+Une porte - Door
+La fenêtre - Window
+Le volet - Shutter
+Le chauffage - Central heating
+
+### Les meubles et appareils (Furniture/Appliances)
+Le canapé - Sofa
+La table - Table
+La chaise - Chair
+Le fauteuil - Armchair
+Le lit - Bed
+La table de chevet - Bedside table
+L’armoire - Wardrobe
+Les étagères - Shelves
+Le tapis - Carpet / rug
+Le lave-linge - Washing machine
+Le lave-vaisselle - Dishwasher
+Le four à micro-ondes - Microwave oven
+Une commode - Chest of drawers
+Un oreiller - Pillow
+Un drap - Sheet
+Une couette - Duvet
+Une serviette - Towel
+Un canapé-lit - Sofa bed
+La moquette - Fitted carpet
+Un coussin - Cushion
+Une table basse - Coffee table
+Un placard - Cupboard
+Un four - Oven
+Un aspirateur - Vacuum cleaner
+Un réfrigérateur / un frigo - Fridge
+Un congélateur - Freezer
+Un évier - Sink
+Un fer à repasser - Iron
+Un radiateur - Radiator
+Allumer - To turn on
+Éteindre - To turn off
+Brancher - To plug in
+
+### Phrases Idiomatiques (Housing)
+J’adore ma chambre parce qu’elle est... grande/ petite/spacieuse - I love my room because it is ... big/small/spacious
+Je n’aime pas ma chambre parce qu’elle est... trop petite/vieille/sombre - I don’t like my room because it is ... too small/old/dark
+J’adore ma chambre parce que c’est mon repaire. C’est le seul endroit où je peux me détendre chez moi ! - I love my room because it is my den. It is the only place where I can relax at home!
+J’aime ma chambre parce qu’elle est moderne et confortable. Je m’y sens bien - I love my room because it is modern and comfortable. I feel good there
+Je déteste ma chambre car elle est trop petite. Je n’ai pas de place pour mes affaires - I hate my room because it is too small. I have no room for my things
+Je partage ma chambre avec... - I share my room with ...
+Je n’aime pas du tout partager ma chambre avec mon petit frère car il laisse traîner ses affaires partout - I don’t like sharing my room with my little brother at all because he leaves his stuff everywhere
+Heureusement, j’ai ma propre chambre, parce que j’aurais du mal à la partager avec mes frangins ! - Luckily, I have my own room, because I would have a hard time sharing it with my brothers!
+Ma chambre se trouve au premier étage et donne sur le jardin - My room is on the first floor and overlooks the garden
+J’auto-proclame besoin de mon propre espace - I need my own space
+
+## 8. Neighborhood Life (La vie du quartier)
+
+### Le quartier (The neighborhood)
+Mon quartier - My neighbourhood
+Les habitants - Inhabitants
+Les voisins - Neighbours
+Les infrastructures - Infrastructure
+Les transports en commun - Public transport
+Une église - A church
+Une bibliothèque - A library
+Un centre commercial - A shopping centre
+Les espaces verts - Green spaces
+Un jardin public - A public park
+Les équipements culturels - Cultural facilities
+Un cinéma - A cinema
+Un theatre - A theatre
+Un centre de loisirs - A leisure centre
+Une boîte (de nuit) - A nightclub
+Les activités sportives - Sports activities
+Une piscine - A swimming pool
+Un stade - A stadium
+Un terrain de tennis - A tennis court
+Une salle de sport - A gym
+
+### Phrases Idiomatiques (The Neighborhood)
+Mon quartier est situé à cinq kilomètres du centre-ville - My neighbourhood is located five kilometres from the city centre
+C’est un quartier assez calme/résidentiel/bruyant/mort/vivant - It is a fairly quiet/residential/noisy/dead/lively neighbourhood
+C’est une ville qui bouge et qui ne dort jamais ! - It’s a city that never sleeps!
+C’est un endroit charmant chargé d’histoire, et une grande attraction touristique - It’s a charming place full of history, and a great tourist attraction
+J’habite en pleine campagne, il y a le paysage à perte de vue - I live in the middle of the countryside, and the landscape stretches as far as the eye can see
+C’est un coin si tranquille qu’on entendrait une mouche voler - It’s such a quiet place that you could hear a pin drop
+
+### Mon quartier est formidable:
+C’est un quartier très animé et je ne m’ennuie jamais ! Il y a tant de choses à faire et à voir - It’s a very lively area and I never get bored! There are so many things to do and see
+Tout est à portée de main comme les commerces et les transports en commun. Il y a pas mal de distractions pour les jeunes - Everything is within reach, like the shops and public transport. There are quite a few things for young people to do
+Ce quartier est le cœur battant de la ville. C’est un vrai petit bijou ! - This neighbourhood is the beating heart of the city. It’s a real little gem!
+Mon quartier est très à la mode avec des cafés et des restaurants branchés - My neighbourhood is cool, with trendy cafés and restaurants
+J’habite dans un petit coin de paradis, il y a la mer à perte de vue ! - I live in a little corner of paradise, the sea stretches as far as the eye can see!
+
+### Mon quartier est nul:
+Il n’y a rien à faire et je m’ennuie à mourir ici ! - There is nothing to do and I am bored to death here!
+Il manque d’infrastructures, surtout pour les jeunes - There is a lack of infrastructure, especially for young people
+Mon quartier est un peu mort le soir car il n’y a pas d’endroits pour sortir ici - My neighbourhood is a bit dead at night because there are no places to go out here
+Je n’aime pas mon quartier car nous avons beaucoup de problèmes sociaux - I don’t like my neighbourhood because we have a lot of social problems
+Mon quartier est mort, après sept heures du soir c’est un désert. Il n’y a pas un chat dans les rues - My neighbourhood is dead, after seven in the evening it’s a desert. There’s not a cat in the streets
+Mon quartier est déprimant, c’est une jungle de béton sans aucun espace vert - My neighbourhood is depressing, it’s a concrete jungle without any green spaces
+Je me sens coupé du monde ici. C’est tellement isolé, on est loin de tout et il faut conduire partout - I feel cut off from the world here. It’s so isolated, we’re far from everything and you have to drive everywhere
+
+## 9. Neighborhood Problems & Crime (Le crime)
+
+### L’environnement (The Environment)
+La circulation - Traffic
+Les embouteillages - Traffic jams
+La pollution - Pollution
+Les déchets/les ordures - Waste/rubbish/litter
+Le bruit - Noise
+Les pistes cyclables - Bicycle lanes
+Le manque de - The lack of
+
+### Le crime (Crime Terms)
+Le délit - Crime
+Le taux de crime - The crime rate
+La délinquance juvénile - Juvenile delinquency
+Le cambriolage - Burglary
+Une agression - Assault
+Les attaques au couteau - Knife attacks
+Le vol - Theft
+Le vol à l'étalage - Shoplifting
+Le vol à main armée - Armed robbery
+Le vandalisme - Vandalism
+L'incendie volontaire / l'incendie criminel - Arson
+Possession de drogues - Drug possession
+Conduite en état d'ivresse - Drunk driving
+La violence domestique - Domestic violence
+L'intrusion - Trespassing
+Se faire arrêter par la police - To be arrested by the police
+Aller en prison - To go to prison
+Punir - To punish
+
+### Phrases Idiomatiques (Crime & Problems)
+Malheureusement, nous avons un grand problème de circulation dans mon quartier - Unfortunately, we have a big problem with traffic in my neighbourhood
+En général, les rues de ma ville sont toujours encombrées et pendant les heures de pointe il y a beaucoup d’embouteillages - In general, the streets of my city are always congested and during rush hour there are a lot of traffic jams
+Le manque de pistes cyclables oblige les gens à utiliser leur voiture - The lack of cycle lanes means people are forced to use their cars
+Dans mon quartier, nous avons un vrai problème avec les déchets - In my neighbourhood, we have a real problem with litter
+Chez nous, on commence à avoir un problème avec la délinquance juvénile - In our neighbourhood, we are starting to have a problem with youth crime
+Tous les soirs on voit les jeunes du quartier qui se droguent ou pratiquent la biture express - Every night we see young people in the neighbourhood taking drugs or binge drinking
+Le problème le plus sérieux chez nous est la criminalité - The most serious problem in our neighbourhood is crime
+On entend de plus en plus parler de cambriolages dans le quartier - We hear more and more about burglaries in the neighbourhood
+Le crime est un problème croissant dans les grandes villes - Crime is a growing problem in big towns
+Les attaques au couteau sont de plus en plus fréquentes dans les zones urbaines, c'est effrayant - Knife attacks are more and more frequent in urban areas - it is frightening
+La police fait de son mieux, mais il n'y a pas assez de policiers dans les rues - The police do their best, but there aren't enough police on the streets
+
+## 10. The Housing Crisis (La crise du logement)
+
+### Vocabulaire Général
+Payer le loyer - To pay rent
+Le manque de logements abordables - The lack of affordable accommodation
+L'augmentation des loyers - The increase of rents
+La forte demande de logements - High demand for accommodation
+Le logement social / Les HLM - Social housing
+Trouver un logement - To find accommodation
+Le marché immobilier - The property market
+Un(e) locataire - A tenant
+Le/la propriétaire - The owner/landlord
+Les loyers élevés - High rent
+Les expulsions - Evictions
+Les politiques de logement - Housing policies
+Les loyers abordables - Affordable rents
+Déménager - To move house
+Les prix de l’immobilier - House prices
+
+### Les SDF (Les personnes sans domicile fixe)
+Une personne sans-abri - A homeless person
+Une personne sans domicile fixe (SDF) - A homeless person
+Dormir dans la rue - To sleep on the streets
+Les centres d'hébergement - Accommodation centres
+Le logement d'urgence - Emergency accommodation
+Être expulsé(e) - To be evicted
+Devenir SDF - To become homeless
+Les listes d'attentes pour le logement - Waiting lists for accommodation
+
+### Phrases Idiomatiques
+La crise du logement est une crise globale et une situation très préoccupante en Irlande - The housing crisis is a global crisis and a very worrying situation in Ireland
+Les prix de l’immobilier ne cessent d’augmenter en raison d’une forte demande et d’une offre faible - House prices continue to rise as there is a high demand and a low supply
+Acheter sa propre maison parait un rêve distant pour beaucoup de jeunes, et pour cette raison, il y en a des milliers qui émigrent - Buying your own home seems like a distant dream for many young people, and because of this, thousands of them are emigrating
+Le nombre de personnes sans abri n’a jamais été si élevé - The number of homeless people has never been so high
+Il y a des milliers de gens qui vivent dans des hôtels et n’ont pas la sécurité de vivre dans leur propre maison. C’est une situation tellement scandaleuse - There are thousands of people living in hotels and they lack the security of living in their own home. It is such a scandalous situation
+Certaines écoles ont du mal à trouver des enseignants parce qu’ils ne trouvent pas de logement abordable près de l’école - Some schools have trouble finding teachers because they can't find affordable housing near the school
+Trouver un logement abordable en ce moment est un vrai cauchemar - Finding affordable accommodation at the moment is a real nightmare
+Les étudiants ont du mal à trouver un logement, beaucoup d'entre eux doivent faire la navette - Students have difficulty finding accommodation - a lot of them have to commute
+Les échecs des gouvernements successifs sont les raisons principales de la crise - The failure of successive governments are the main reasons for the crisis
+
+## 11. Countries and Languages (Les pays et les langues)
+
+### L’Europe (Europe)
+L’Allemagne - Germany
+Un Allemand / une Allemande - A German person
+L’allemand - German (language)
+La Belgique - Belgium
+Un/une Belge - A Belgian person
+Le néerlandais, le français et l’allemand - Dutch, French and German
+L’Espagne - Spain
+Un Espagnol / une Espagnole - A Spanish person
+L’espagnol - Spanish (language)
+La France - France
+Un Français / une Française - A French person
+Le français - French (language)
+La Grèce - Greece
+Un Grec / une Grecque - A Greek person
+Le grec - Greek (language)
+L’Irlande - Ireland
+Un Irlandais / une Irlandaise - An Irish person
+L’anglais / le gaélique - English / Gaelic
+L’Italie - Italy
+Un Italien / une Italienne - An Italian person
+L’italien - Italian (language)
+Les Pays-Bas - The Netherlands
+Un Néerlandais / une Néerlandaise - A Dutch person
+Le néerlandais - Dutch (language)
+La Pologne - Poland
+Un Polonais / une Polonaise - A Polish person
+Le polonais - Polish (language)
+Le Portugal - Portugal
+Un Portugais / une Portugaise - A Portuguese person
+Le portugais - Portuguese (language)
+L’Autriche - Austria
+Un Autrichien / une Autrichienne - An Austrian person
+L’allemand - German (language)
+La Suède - Sweden
+Un Suédois / une Suédoise - A Swedish person
+Le suédois - Swedish (language)
+
+### Le Reste du Monde (Rest of the World)
+Le Canada - Canada
+Un Canadien / une Canadienne - A Canadian person
+L’anglais / le français - English / French
+Le Cameroun - Cameroon
+Un Camerounais / une Camerounaise - A Cameroonian person
+Le français - French (language)
+La Côte d’Ivoire - Ivory Coast
+Un Ivoirien / une Ivoirienne - An Ivorian person
+Le français - French (language)
+La République démocratique du Congo - Democratic Republic of the Congo
+Un Congolais / une Congolaise - A Congolese person
+Le français - French (language)
+Le Sénégal - Senegal
+Un Sénégalais / une Sénégalaise - A Senegalese person
+Le français - French (language)
+Le Maroc - Morocco
+Un Marocain / une Marocaine - A Moroccan person
+L’arabe - Arabic (language)
+La Tunisie - Tunisia
+Un Tunisien / une Tunisienne - A Tunisian person
+L’arabe - Arabic (language)
+La Suisse - Switzerland
+Un/une Suisse - A Swiss person
+Le français / l’italien / l’allemand / le romanche - French / Italian / German / Romansh
+Le Luxembourg - Luxembourg
+Un Luxembourgeois / une Luxembourgeoise - A Luxembourger
+Le français / l’allemand - French / German
+Le Vietnam - Vietnam
+Un Vietnamien / une Vietnamienne - A Vietnamese person
+Le vietnamien - Vietnamese (language)
+
+## 12. Countryside vs. City (La campagne contre la ville)
+
+### Vocabulaire
+Le paysage - The scenery
+La terre - The land
+La nature - Nature
+Un fermier - Farmer
+Tranquille - Peaceful
+Le sens de la communauté - The sense of community
+Le milieu urbain - Urban environment
+Les embouteillages - Traffic jams
+Le manque d’espaces verts - Lack of green spaces
+Surpeuplé - Overcrowded
+
+### La campagne (The Countryside)
+J’aime vivre en pleine nature, c’est un style de vie très sain et relaxant - I like living in the countryside, it’s a very healthy and relaxing lifestyle
+C’est mieux de vivre à la campagne car il y a moins de criminalité et moins de pollution - It’s better to live in the countryside because there’s less crime and less pollution
+Les gens se sentent plus en sécurité à la campagne - People feel safer in the countryside
+À mon avis, les gens de la campagne sont plus ouverts et chaleureux que les citadins - In my opinion, people from the countryside are more open and warm than city dwellers
+C’est joli la campagne, mais quand on est jeune adulte il n’y a pas grand-chose à faire là-bas - The countryside is beautiful, but when you’re a young adult there’s not much to do there
+Il est difficile de se déplacer à la campagne à cause du manque de transports en commun - It’s difficult to get around in the countryside because of a lack of public transport
+Il est aussi difficile de trouver un logement à la campagne qu’en ville en ce moment - It is as difficult to find housing in the countryside as in the city at the moment
+
+### La ville (The City)
+En ville, il y a toujours quelque chose à faire, on ne s'ennuie jamais - In the city, there is always something to do – you never get bored
+Pour s’amuser le soir, il y a tout un tas de cinémas, de discothèques, de salles de concerts et de bars - For fun in the evening, there are a lot of cinemas, night clubs, concert venues and bars
+Il est très facile de se déplacer en ville : on peut voyager en métro, en bus ou en tramway - It is very easy to get around the city: you can travel by metro, bus or tram
+En ville les gens ne connaissent même pas leurs voisins. Ce style de vie est trop impersonnel pour moi - In the city, people do not even know their neighbours. This lifestyle is too impersonal for me
+Le taux de criminalité et de violence ne cesse d’augmenter en ville - The crime rate and violence are constantly increasing in the city
+La vie en ville est gâchée par la circulation, la pollution et les bouchons - Life in the city is spoiled by traffic, pollution and traffic jams
+On voit des annonces qui demandent des loyers exorbitants pour des toutes petites chambres - We see ads asking for exorbitant rents for very small rooms
+
+## 13. Friendship (L’amitié)
+
+### Les copains (Friends)
+Un/une ami(e) proche - A close friend
+Mon/ma meilleur(e) ami(e) - My best friend
+Mon copain / mon petit ami - My friend/boyfriend
+Ma copine / ma petite amie - My friend/girlfriend
+Un/une ami(e) virtuel(le) - An online friend
+Je fais partie d’un groupe d’amis - I have a gang of friends
+
+### Parler d’amitié (Talking about friendship)
+Se faire des amis - To make friends
+Rire ensemble - To laugh together
+Avoir des choses en commun - To have things in common
+Se connaître depuis ___ ans - To have known each other for ___ years
+On s’est rencontré... / Nous nous sommes rencontré(e)s... - We met each other ...
+Être copains comme cochons - To be very good friends
+Un bon ami(e) est compréhensif(ve) et m’accepte tel(le) que je suis - A good friend is understanding and accepts me as I am
+
+### Mon meilleur ami / Ma meilleure amie
+Nous avons à peu près le même âge - We are about the same age
+Nous avons grandi ensemble - We grew up together
+On se connaît depuis dix ans : on était dans la même classe à l’école primaire - We’ve known each other for 10 years: we were in the same class in primary school
+On a tout de suite sympathisé parce qu’on avait le même sens de l’humour - We clicked straight away because we had the same sense of humour
+Il a toujours un bon conseil quand j’en ai besoin - He always has good advice when I need it
+Je serais perdu(e) sans elle/lui - I would be lost without her/him
+J’ai vraiment confiance en elle/lui / Je lui fais confiance - I trust her/him
+Il/elle sait toujours comment me faire rire, même quand je suis de mauvaise humeur ou stressé(e) - He/she always knows how to make me laugh, even when I’m in a bad mood or stressed out
+On s’envoie des textos tous les jours - We text each other every day
+On se voit tous les week-ends - We see each other every weekend
+On a les mêmes goûts et intérêts - We have the same tastes and interests
+
+## 14. Youth Social Life (Les jeunes adorent sortir !)
+
+### Vendredi soir je vais... (Friday night I'm going to...)
+Sortir en boîte - To go to a club
+Aller au cinéma - To go to the cinema
+Faire la fête - To party
+Sortir avec mon copain / ma copine - To go out with my boyfriend/girlfriend
+Passer une soirée entre amis - To go on a night out with friends
+
+### Ce week-end je vais... (This weekend I'm going to...)
+Dîner au resto - To have dinner in a restaurant
+Visiter un musée - To go to a museum
+Faire du shopping - To go shopping
+Aller au théâtre - To go to the theatre
+Aller à un match - To go to a match
+Assister à un concert - To go to a concert
+
+### Phrases Idiomatiques
+Traîner en ville - To hang out in town
+Prendre un verre - To have a drink
+Se faire une bouffe ensemble - To have a bite to eat together
+Flâner au parc - To stroll around the park
+
+## 15. Fashion & Clothing (Être à la mode)
+
+### Les vêtements (Clothes)
+une robe - dress
+une jupe - skirt
+un chemisier - blouse
+une chemise - shirt
+un pantalon - pair of trousers
+un manteau - overcoat
+un imperméable - raincoat
+un jean - pair of jeans
+une veste - jacket
+un survêtement - tracksuit
+un tee-shirt - T-shirt
+une cravate - tie
+un costume - suit
+un pull - jumper
+un gilet - cardigan
+un collant - tights
+un pyjama - pyjamas
+des vêtements de sport (m.) - sportswear
+un short - shorts
+un maillot (de bain) - swimsuit / swimming trunks
+une chemise de nuit - nightdress
+
+### Les chaussures (Shoes)
+des ballerines - pumps
+des baskets - trainers (fam.)
+des bottes - boots
+des bottes de pluie - wellies
+des talons - high heels
+des talons aiguilles (f.) - stiletto heels
+des sandales (f.) - sandals
+des chaussons (m.) / des pantoufles - slippers
+
+### Les accessoires (Accessories)
+une ceinture - belt
+un chapeau - hat
+des chaussettes - socks
+une écharpe - scarf
+des lunettes de soleil - sunglasses
+un sac à main - handbag
+une bague - ring
+un collier - necklace
+un bracelet - bracelet
+des boucles d'oreille (f.) - earrings
+une casquette - cap
+des gants (m.) - gloves
+
+### Le style et les matières (Style & Materials)
+branché - trendy
+démodé - old-fashioned
+être à la mode - to be fashionable
+un look - style
+une tendance - trend
+des tenues - outfits
+coudre - to sew
+tricoter - to knit
+se déshabiller - to get undressed
+un tissu - material
+le cuir - leather
+la dentelle - lace
+le daim - suede
+rayé - striped
+à carreaux - checked
+écossais(e) - tartan
+la laine - wool
+la soie - silk
+le coton - cotton
+le velours - velvet
+
+### Phrases idiomatiques (Fashion)
+Le week-end, j’aime être confortable, je porte des vêtements décontractés comme un jean, un sweat à capuche et des baskets - At the weekend, I like to be comfortable. I wear casual clothes like jeans, a hoodie and runners.
+J’adore la mode, je suis beaucoup d’influenceurs/influenceuses pour voir ce qu’ils/elles portent. Ça m’inspire! - I love fashion – I follow a lot of influencers to see what they wear. That inspires me!
+Quand je vais à la salle de sports, je mets toujours un legging et un tee-shirt léger, pour pouvoir bouger librement - When I go to the gym, I always wear leggings and a light T-shirt so I can move about freely.
+Je n’aime pas la « fast fashion ». Je préfère acheter mes vêtements dans des friperies ou sur des sites comme Vinted, parce que c’est plus éthique et j’aime l’idée de donner une seconde vie aux vêtements - I don’t like fast fashion. I prefer buying my clothes from second-hand shops or on websites like Vinted, because it’s more ethical and I love the idea of giving clothes a second life.
+
+## 16. Online Shopping (Faire des achats en ligne)
+
+### Faire du shopping sur Internet
+commander quelque chose - to order something online
+ajouter au panier - to add to the basket
+se faire livrer à domicile - to get it delivered
+les livraisons gratuites - free deliveries
+essayer des vêtements - to try on clothes
+faire un achat compulsif et spontané - to make a compulsive and spontaneous purchase
+
+### Les avantages (Advantages)
+Les prix sont plus bas - The prices are lower.
+Il y a plus de choix - There is more choice.
+On peut faire des achats à tout moment - You can shop at any time.
+On peut commander de n’importe où - You can order from anywhere.
+C’est extrêmement pratique, on peut faire son shopping sans bouger de chez soi - It’s extremely handy – you can shop from the comfort of your own home.
+Les livraisons sont souvent gratuites - Delivery is often free.
+C’est plus facile de comparer les produits - It’s easier to compare products.
+J’achète des produits de beauté en ligne car il y a plus de choix, et des avis qui m’aident à choisir - I buy beauty products online because there’s more choice and (there are) reviews that help me decide.
+
+### Les inconvénients (Disadvantages)
+Les petites boutiques ont du mal à survivre avec la concurrence du commerce en ligne - Small shops have difficulty surviving with the competition from online retailers.
+On ne peut pas toucher ou essayer le produit avant de l’acheter - You can’t touch or try the product before buying it.
+Il existe des risques de sécurité : des cybercriminels peuvent voler vos données personnelles et votre argent - There are security risks: cybercriminals can steal your private data and your money.
+Même si j’adore faire du shopping en ligne, je me sens parfois mal quand je pense à l’impact environnemental des livraisons - Even though I love shopping online, I sometimes feel bad when I think about the environmental impact of deliveries.
+J’ai tendance à acheter trop de choses en ligne, c’est facile de craquer quand je vois des réductions - I tend to buy too many things online – it’s easy to give in when I see discounts.
+Le shopping en ligne encourage la surconsommation, qui est mauvaise pour la planète - Online shopping encourages overconsumption, which is bad for the planet.
+
+## 17. Pocket Money (L'argent de poche)
+
+### Mon argent
+gagner de l'argent de poche - to earn pocket money
+donner de l'argent de poche - to give pocket money
+économiser - to save
+gaspiller de l'argent - to waste money
+recevoir de l'argent de poche - to receive pocket money
+gérer l'argent - to manage money
+dépenser - to spend
+mon compte bancaire - my bank account
+
+### Phrases idiomatiques (Money)
+Je reçois 10€ par semaine - I receive €10 a week.
+Mes parents me donnent 50€ par mois - My parents give me €50 a month.
+Ma mère me donne 15€ par semaine. Avec cet argent je paie mes sorties et j’économise un peu - My mum gives me €15 a week. I use the money for going out and I save a bit.
+Mes parents mettent directement de l’argent sur mon compte Revolut - My parents put money directly into my Revolut account.
+Je ne reçois pas d’argent de poche mais mes parents me donnent de l’argent quand j’en ai besoin - I don’t receive pocket money, but my parents give me money when I need it.
+Je gère très bien mon argent - I manage my money very well.
+Je ne gère pas très bien mon argent - I don’t manage my money well.
+J’essaie de mettre de l’argent de côté - I try to put money aside.
+Si j’ai besoin d’argent, mes parents m’obligent à faire du ménage pour le gagner - If I need money, my parents make me do housework to earn it.
+Je suis très dépensier/dépensière, ma mère me dit que je jette de l’argent par les fenêtres ! - I’m a big spender, my mum tells me I throw money out the window!
+Je dépense tout mon argent de poche. D’habitude, j’achète des vêtements et des livres - I spend all my pocket money. Usually, I buy clothes and books.
+Je suis toujours à découvert/fauché(e) - I’m always overdrawn/broke.
+Mes amis et moi voulons aller à l’étranger l’été prochain, donc je fais des économies pour pouvoir y aller m’y amuser - My friends and I want to go abroad next summer, so I’m saving up so that we can go and have fun.
+Quand je serai à la fac, j’aurai beaucoup de frais. Pour ça, j’essaie d’économiser le plus possible - When I’m at university, I’ll have a lot of expenses. For that, I try to save as much as possible.
+
+## 18. Part-time Jobs (Les jeunes et les petits boulots)
+
+### Les petits boulots
+un travail - job
+un boulot - job (fam.)
+un boulot d’été - summer job
+un stage - work experience
+un(e) employé(e) - employee
+un caissier/une caissière - cashier
+un serveur/une serveuse - waiter/waitress
+faire du baby-sitting - to babysit
+gagner de l’argent - to earn money
+gagner le SMIC - to earn the minimum wage
+un salaire - salary
+travailler à temps partiel - to work part-time
+travailler à plein temps - to work full-time
+travailler comme bénévole - to work as a volunteer
+
+### Phrases idiomatiques (Jobs)
+Je travaille tous les week-ends - I work every weekend.
+Je travaille le jeudi et le vendredi soir - I work Thursday and Friday evenings.
+Les jours sont assez chargés, je commence à 9 heures et je finis à 18 heures - The days are quite busy, I start at 9 and finish at 6.
+Le travail est fatigant mais agréable. Je m’entends très bien avec mes collègues - The work is tiring but enjoyable. I get along very well with my colleagues.
+Le/la gérant(e) est strict(e) mais juste - The manager is strict but fair.
+Je sers les clients - I serve customers.
+Je dresse et je débarrasse les tables - I set and clear tables.
+Je travaille à la caisse - I work at the till.
+Je réponds au téléphone - I answer the phone.
+Je m’occupes des enfants, je les divertis et je les mets au lit - I look after the children, entertain them and put them to bed.
+
+## 19. Work Experience (Mon stage professionnel)
+
+### Les lieux de travail
+une agence de publicité - advertising agency
+une banque - bank
+une boutique - shop
+un bureau - office
+une clinique vétérinaire - veterinary clinic
+une crèche - crèche
+une école primaire - primary school
+un hôpital - hospital
+un laboratoire - lab
+un magasin de sport - sports shop
+une maison de retraite - retirement home
+un salon de beauté - beauty salon
+
+### Les tâches (Tasks)
+répondre au téléphone - answer the phone
+ranger les étagères - tidy the shelves
+plier les vêtements - fold clothes
+travailler à la caisse - work at the till
+servir les client(e)s - serve customers
+s’occuper des animaux - take care of the animals
+envoyer des emails - send emails
+aider les enfants - help the children
+aider les personnes âgées - help the older people
+classer les fichiers - filing
+préparer à manger - prepare food
+travailler sur ordinateur - work on a computer
+
+### Phrases idiomatiques (Work Experience)
+J’ai fait un stage dans un/une... - I did work experience in a ...
+J’ai beaucoup aimé cette expérience professionnelle et j’ai beaucoup appris - I really enjoyed this work experience and learned a lot.
+Je me levais tôt tous les jours et je m’habillais professionnellement - I got up early every day and dressed professionally.
+J’observais les personnes dans le cadre professionnel et j’aidais autant que je pouvais - I observed people in the professional setting and helped as much as I could.
+Je travaillais des journées assez longues et j’étais épuisé(e) à la fin de la semaine - I worked quite long days and was exhausted at the end of the week.
+J’ai bossé car j’ai voulu faire une bonne impression - I worked hard because I wanted to make a good impression.
+
+## 20. Celebrities and Influencers (Les célébrités et les influenceurs)
+
+### Les célébrités et créateurs de contenu
+un/une influenceur/influenceuse - an influencer
+des abonnés - followers
+les posts/les publications - posts
+des posts sponsorisés - sponsored posts
+les commentaires - comments
+sa cible - his/her target audience
+faire le buzz - to go viral
+des célébrités - celebrities
+des vedettes - stars
+des étoiles du sport - sports stars
+un/une porte-parole - spokesperson
+un/une streameur/streameuse - a streamer
+une marque de luxe - a luxury brand
+des produits de marque - designer products
+des produits de beauté - beauty products
+le marketing - marketing
+créer/partager le contenu - to create/share content
+les filtres - filters
+des vidéos iconiques - iconic videos
+actualiser une page - refresh a page
+voir les mises à jour - to see updates
+un style de vie luxueux - a luxurious lifestyle
+
+### Mes influenceurs(-euses) préféré(e)s
+Je suis un influenceur gaming. Il donne des astuces géniales pour progresser dans mes jeux préférés - I follow a gaming influencer. He gives great tips for progressing in my favourite games.
+Je suis une influenceuse humoristique - ses vidéos drôles me font toujours rire - I follow a comedian. Her funny videos always make me laugh.
+Il/Elle a partagé une vidéo iconique qui a fait le buzz du jour au lendemain - He/She shared an iconic video that went viral overnight.
+Il/Elle partage souvent des produits de marque, surtout des produits de beauté ou des vêtements - He/She often shares designer products, especially beauty products or clothing.
+Il/Elle suggère parfois des alternatives moins chères pour les produits de beauté coûteux - He/She sometimes suggests cheaper alternatives for expensive beauty products.
+Il/Elle crée du contenu engageant et il/elle met des photos et vidéos en ligne quotidiennement - He/She creates engaging content and he/she uploads photos and videos daily.
+Il/Elle a des milliers d’abonnés - He/She has thousands of followers.
+
+### L'influence des célébrités
+Leur influence se fait sentir dans les tendances actuelles, de la mode à la musique - Their influence is felt in current trends, from fashion to music.
+Ils reçoivent souvent des produits gratuits pour les promouvoir sur leurs réseaux sociaux - They often receive free products to promote on their social media.
+Les posts sponsorisés ne sont pas authentiques, ça me fait perdre confiance en ce qu'ils partagent - Sponsored posts are not authentic – it makes me lose trust in what they share.
+Beaucoup de jeunes sont accros aux réseaux sociaux, ils consultent les profils des influenceurs qu’ils suivent constamment - Many young people are addicted to social networks – they consult the profiles of the influencers they follow constantly.
+Travailler avec des influenceurs joue un rôle crucial dans les stratégies de marketing des entreprises - Working with influencers plays a crucial role in the marketing strategies of businesses.
+Les influenceurs accomplis peuvent gagner des revenus substantiels - Successful influencers can earn a substantial income.
+Les filtres sur Instagram rendent tout le monde parfait - The filters on Instagram make everyone look perfect.
+Les vedettes promeuvent des modes de vie irréalistes - Stars promote unrealistic lifestyles.
+Les commentaires négatifs sur les réseaux sociaux peuvent vraiment affecter l’estime de soi - Negative comments on social media can really affect self-esteem.
+Certains influencent négativement les jeunes en faisant la promotion de comportements toxiques - Some negatively influence young people by promoting toxic behaviours.
+
+## 21. Diary Entry Phrases (Écrire dans son journal intime)
+
+### Opening (positive)
+Quelle journée merveilleuse ! - What a wonderful day!
+Comme je suis fatigué(e) ! Je viens de passer une superbe journée - Oh, I'm so tired. I have just had the most wonderful day.
+Quelles bonnes nouvelles ! - What wonderful news!
+
+### Opening (negative)
+Quel cauchemar ! Je viens de passer la pire journée de ma vie - What a nightmare! I have just had the worst day of my life.
+Quelle catastrophe ! Aujourd’hui n’a vraiment pas été une bonne journée pour moi - What a catastrophe! Today really did not go well for me.
+Quelles mauvaises nouvelles ! - What awful news!
+
+### General Phrases
+Quelle journée/soirée ! - What a day/night!
+Me voici après une journée bien occupée - Here I am after a busy day.
+Il est tard et je suis tout(e) seul(e) chez moi - It’s late and I’m home alone.
+Je n’y crois pas - I don’t believe it.
+Incroyable, mais vrai - Unbelievable, but true.
+Je viens d’apprendre que... - I have just learned that ...
+
+### Discussing events
+Je viens de rentrer de l’école/des vacances/d’un concert - I have just come back from school/holidays/a concert.
+Ce soir je suis allé(e) au cinéma/au café/en boîte avec toute la bande - This evening I went to the cinema/café/nightclub with the gang.
+Aujourd’hui je suis allé(e) en ville/au lycée/au concert/au café - Today I went to town/school/a concert/a café.
+C’était vraiment fantastique/génial/formidable - It was really fantastic/great.
+Je me suis bien amusé(e) aujourd’hui/ce soir - I really enjoyed myself today/this evening.
+
+### Discussing emotions
+Je suis ravi(e)/content(e)/aux anges - I'm delighted/happy/thrilled.
+J’ai vraiment de la chance - I'm so lucky.
+Vive les vacances ! - Long live the holidays!
+C’est la belle vie ! - This is the life!
+Je suis triste/fâché(e)/inquiet (inquiète)/choqué(e) - I'm sad/angry/worried/shocked.
+Personne ne me comprend - Nobody understands me.
+Je me sens tout(e) seul(e) - I feel all alone.
+Je m’ennuie à mourir - I'm bored to death.
+J’ai le cafard./Je suis déprimé(e) - I'm depressed.
+Je suis furieux/furieuse contre mes parents/mon frère/ma sœur/mes copains - I'm furious with my parents/my brother/my sister/my friends.
+J’en ai marre de... - I'm totally fed up with ...
+Ça m’énerve ! - That drives me crazy!
+Quel culot ! - What a nerve!
+
+### Signing off
+C’est tout pour ce soir - That's all for tonight.
+Je suis vraiment fatigué(e). Je vais me coucher - I'm really tired. I'm going to bed.
+Là, je n’en peux plus. Je vais me coucher - I've had enough. I'm going to bed.
+J’espère que demain tout ira mieux - I hope that things will be better tomorrow.
+Vivement demain soir/le week-end - I can't wait for tomorrow night/the weekend.
+Bonne nuit - Good night.
+À demain - Until tomorrow.
+
+## 22. Hobbies (Les passe-temps)
+
+### Vocabulaire
+le cinéma - cinema
+l'informatique - IT/computing
+la lecture - reading
+la photographie - photography
+le sport - sport
+la danse - dance
+les jeux vidéo - video games
+la peinture - painting
+les réseaux sociaux - social networks
+la télévision - television
+le dessin - drawing
+la musique - music
+le tricot - knitting
+les sorties - outings
+le théâtre - theatre
+
+### Activités sociales et culturelles
+Je passe du temps avec mes amis en ville - I spend time with my friends in the city.
+Le week-end, je vais souvent au cinéma pour voir les derniers films - At the weekends, I often go to the cinema to see the latest films.
+J’adore traîner au parc avec mes amis, on bavarde de tout et de rien - I love hanging out in the park with my friends – we chat about everything and nothing.
+Je vais régulièrement à des concerts pour écouter mes groupes préférés - I go to concerts regularly to listen to my favourite bands.
+J’adore visiter des musées ou des expositions pour découvrir de nouvelles choses - I love visiting museums or exhibitions to discover new things.
+J’adore voir des pièces, je vais au théâtre autant que je peux - I love seeing plays – I go to the theatre as much as I can.
+
+### Activités créatives
+J’adore exprimer ma créativité, je dessine et je peins - I love expressing my creativity – I draw and paint.
+Je prends des photos et je mets à jour mon compte Instagram - I take pictures and update my Instagram account.
+J’utilise mon temps libre pour jouer du piano/de la guitare - I use my free time to play piano/guitar.
+J’aime écrire des poèmes ou des petites histoires - I like to write poems or short stories.
+
+### Activités technologiques
+Je passe des heures sur les réseaux sociaux, surtout TikTok et Instagram - I spend hours on social media, especially TikTok and Instagram.
+Je regarde des tutoriels sur YouTube pour apprendre de nouvelles choses - I watch tutorials on YouTube to learn new things.
+Je crée des vidéos sur TikTok - I create videos on TikTok.
+Je suis les influenceurs pour découvrir de nouvelles tendances - I follow influencers to discover new trends.
+J’adore créer du contenu pour ma chaîne YouTube ou mon blog - I love creating content for my YouTube channel or blog.
+Je discute avec mes amis sur Snapchat ou WhatsApp pendant des heures - I chat with my friends on Snapchat or WhatsApp for hours.
+Je crée de nouvelles playlists sur Spotify - I create new playlists on Spotify.
+Je joue aux jeux vidéo en ligne avec mes amis - I play online video games with my friends.
+Je passe des soirées entières à construire des mondes dans Minecraft - I spend entire evenings building worlds in Minecraft.
+
+### Phrases idiomatiques (Hobbies)
+Je ne peux pas me passer de musique - I can’t live without music.
+Je suis accro à... - I’m addicted to ...
+Après mon cours de danse j’ai la pêche ! - After my dance class, I feel great!
+Courir me défoule, je me mets dans ma bulle et je ne pense à rien ! - Running lets off steam – I get into my own bubble and I don’t think about anything!
+Je raffole de... - I love ...
+
+## 23. Television & Media (La télé)
+
+### Vocabulaire
+la télévision - television
+une chaîne (de télévision) - TV channel
+une émission - programme
+une série - series
+la télé-réalité - reality TV
+un télé-crochet - TV talent show/singing contest
+un feuilleton - soap opera
+un documentaire - documentary
+les infos/les actualités - news/current affairs
+un jeu télévisé - game show
+un dessin animé - cartoon
+une publicité - advertisement
+en direct - live
+le présentateur/la présentatrice - presenter
+un téléspectateur/une téléspectatrice - viewer
+doubler - to dub
+un abonnement - subscription
+des marathons télé/de séries - binge watching
+le streaming sur Netflix - streaming on Netflix
+les plateformes de streaming - streaming platforms
+des applications de streaming - streaming apps
+mon temps d’écran - my screentime
+
+### Phrases idiomatiques (Media)
+Je ne rate jamais un épisode de... - I never miss an episode of ...
+... est mon plaisir honteux. - ... is my guilty pleasure.
+Je regarde mes séries préférées sur mon smartphone - I watch my favourite series on my phone.
+Ma mère me dit toujours que je passe trop de temps devant l’écran - My mother always tells me that I spend too much time in front of the screen.
+Quand je voyage, je télécharge mes séries sur ma tablette pour les regarder hors ligne - When I travel, I download my series on my tablet to watch them offline.
+
+## 24. Music (Mes goûts musicaux)
+
+### Les genres (Genres)
+la (musique) pop - pop music
+l’indie-pop - indie-pop
+le rock - rock
+la musique traditionnelle - traditional music
+le country - country music
+le hip-hop - hip-hop
+le jazz - jazz
+la musique classique - classical music
+le R&B - R&B
+la musique électronique - electronic music
+la techno - techno
+le rap - rap
+
+### Les instruments (Jouer du / de la...)
+le piano - piano
+le violon - violin
+le saxophone - saxophone
+l’ukulélé - ukulele
+le violoncelle - cello
+le trombone - trombone
+la guitare (électrique) - (electric) guitar
+la flûte - flute
+la harpe - harp
+la batterie - drums
+la basse - bass guitar
+la clarinette - clarinet
+
+### Les concerts
+le guichet - box office
+le lieu - venue
+les billets/les places - tickets
+la fosse - standing area (in front of stage)
+les festivals - festivals
+la tête d’affiche - headliner
+la scène - stage
+les gradins - (tiered) seating area
+
+### Phrases idiomatiques (Music)
+Mon/ma chanteur(euse) préféré(e) est... - My favourite singer is ...
+Mon groupe préféré est... - My favourite band is ...
+Ma chanson préférée est... - My favourite song is ...
+Je suis passionné(e) de musique techno. J’adore sortir en boîte - I am passionate about techno music. I love going out to clubs.
+J’adore la musique traditionnelle irlandaise. Ce style de musique peut être très émouvant - I love traditional Irish music. This style of music can be very moving.
+Je suis mélomane et j’aime un peu de tout : la pop, le jazz et la musique classique - I am a music-lover, and I like a bit of everything: pop, jazz and classical music.
+J’ai assisté au concert de Coldplay à Croke Park l’été dernier. Les places coutaient cher mais à mon avis ça valait le coup ! - I went to the Coldplay concert in Croke Park last summer. The tickets were expensive but I think it was worth it!
+J’adore assister aux festivals de musique comme Electric Picnic with mon copain. L’ambiance est excellente et il y a aussi toujours de bons groupes à l’affiche - I love going to music festivals such as Electric Picnic with my friend. The atmosphere is great and there are always good bands playing too.
+Je joue du/de la ... depuis ... ans - I have been playing the ... for ... years
+Je chante dans la chorale de l’école et je prends des cours de solfège - I sing in the school choir and take music theory lessons.
+
+## 25. Sports & Physical Activity (Les sports)
+
+### Vocabulaire des sports
+l’athlétisme - athletics
+l’aviron - rowing
+le basket - basketball
+le camogie - camogie
+le cyclisme - cycling
+l’escalade - climbing
+l’escrime - fencing
+l’équitation - horse riding
+le football (le foot) - soccer
+le football gaélique - gaelic football
+la gymnastique - gymnastics
+le hurling - hurling
+le hockey - hockey
+le hockey sur glace - ice hockey
+la marche - walking
+la natation - swimming
+la planche à voile - windsurfing
+la plongée - diving
+le patinage - skating
+la pétanque - boules
+le rugby - rugby
+le ski - skiing
+le ski nautique - water skiing
+le surf - surfing
+le tennis - tennis
+le tir à l’arc - archery
+le volley - volleyball
+le VTT - mountain biking
+la voile - sailing
+le yoga - yoga
+
+### L’activité physique et l’entraînement
+faire du sport - to play sports
+aller à la salle/à la salle de sport - to go to the gym
+faire de la natation en mer - to swim in the sea
+suivre des cours d’exercices sur YouTube - to follow exercise classes on YouTube
+s’entraîner - to train
+une séance d’entraînement - a training session
+s’échauffer - to warm up
+faire des étirements - to do stretching
+participer à des championnats - to participate in championships
+gagner / perdre - to win/lose
+un entraîneur/une entraîneuse - a trainer/coach
+un joueur/une joueuse - a player
+une équipe - a team
+des coéquipiers/coéquipières - teammates
+les poids - weights
+un terrain de sport - a sports field
+la musculation - weight training
+
+### Pratiquer un sport (Phrases)
+Je préfère les sports collectifs car j’aime l’esprit d’équipe - I prefer team sports because I like team spirit.
+Je suis membre d’une équipe de rugby à l’école - I am a member of a rugby team at school.
+Je suis capitaine de l’équipe de football - I am captain of the football team.
+Je joue à l’arrière/à l’avant/en milieu de terrain - I’m a defender/a forward/a midfielder.
+Je suis gardienne de but pour mon équipe de camogie - I am a goalkeeper for my camogie team.
+Je m’entraîne trois fois par semaine - I train three times a week.
+Je préfère les sports individuels car ils me permettent de mieux me relaxer - I prefer individual sports because they allow me to relax better.
+Pour rester en forme, je fais une demi-heure de jogging tous les matins - To stay fit, I jog for half an hour every morning.
+Je passe tout mon temps libre à faire du vélo car j’adore être en plein air - I spend all my free time cycling because I love being outdoors.
+En été, je vais à la plage faire du surf - In the summer, I go to the beach to surf.
+Chaque hiver, je pars à la montagne faire du ski - Every winter, I go to the mountains to ski.
+J’aime bien faire de la marche en montagne - I like walking in the mountains.
+
+### Phrases idiomatiques (Sports)
+Faire partie d’une équipe m’enseigne des valeurs importantes - Being part of a team teaches me important values.
+L’esprit d’équipe est fantastique - Team spirit is fantastic.
+Je ne rate jamais un entraînement - I never miss a training session.
+Rester en forme est très important pour moi - Keeping fit is very important to me.
+Les activités sportives sont aussi importantes pour la santé physique que la santé mentale - Sports activities are as important for physical health as they are for mental health.
+Il faut que les jeunes fassent de l’exercice pour leur bien-être physique et mental - Young people need to exercise for their physical and mental wellbeing.
+
+## 26. Vacations & Holidays (Parler des vacances)
+
+### Les vacances
+être en vacances - to be on holidays
+les grandes vacances - summer holidays
+les vacances d’hiver/de la toussaint - winter/Halloween (All Saints) holidays
+les vacances de Pâques/Noël - Easter/Christmas holidays
+voyager - to travel
+séjourner - to stay/spend time
+
+### Le voyage
+prendre le train/la voiture/l’avion - to take the train/car/plane
+le vol - the flight
+le trajet - the journey
+louer une voiture/un vélo - to rent a car/bicycle
+réserver les billets - to reserve the tickets
+les horaires - timetables
+
+### Les activités
+visiter des musées et des monuments - to visit museums and monuments
+découvrir la ville - to discover the town
+aller à la plage - to go to the beach
+partir en excursion - to go on a trip
+assister à des spectacles - to attend shows
+faire des randonnées - to go for hikes/walks
+
+### Les destinations
+partir à l’étranger - to go abroad
+partir au bord de la mer - to go to the seaside
+partir à la campagne - to go to the countryside
+partir à la montagne - to go to the mountains
+une station de ski - a ski resort
+une station balnéaire - a beach resort
+
+### Le logement
+loger dans un hôtel - to stay in a hotel
+séjourner dans un camping - to stay on a campsite
+séjourner dans une auberge de jeunesse - to stay in a youth hostel
+louer un gîte/un Airbnb - to rent a holiday home/Airbnb
+une résidence secondaire - a holiday home
+une location saisonnière - a holiday rental
+
+### Faire les valises
+le passeport - passport
+le chargeur (de téléphone portable) - (phone) charger
+la crème solaire - suncream
+le maillot de bain - swimsuit
+les lunettes de soleil - sunglasses
+la serviette de plage - beach towel
+les sandales - sandals
+les écouteurs - headphones
+
+### Phrases idiomatiques (Vacations)
+J’adore partir à l’aventure - I love to set off on an adventure.
+Je recherche le dépaysement - I’m looking for a change of scenery.
+On va souvent en vacances pour les ponts... - We often go on holidays for the long weekends ...
+... quand mes parents ont des jours de congés - ... when my parents have days off.
+Je prépare toujours une liste pour ne rien oublier - I always make a list, so I don’t forget anything.
+J’emmène toute ma maison avec moi ! - I bring the whole house with me!
+Je veux dormir à la belle étoile - I want to sleep under the stars.
+On séjourne/loge dans un hôtel de luxe - We stay in a luxury hotel.
+La France est mon deuxième chez moi - France is my home away from home.
+J’ai du mal à dormir à cause du décalage horaire - I have trouble sleeping because of the time difference.
+Je souffre beaucoup avec le jetlag - I suffer a lot with jet lag.
+J’ai expérimenté le choc culturel - I experienced culture shock.
+Le mieux c’est de partager des moments inoubliables - The best thing is to share unforgettable moments.
+Je m’échappe de la vie quotidienne - I escape everyday life.
+Je peux communiquer malgré la barrière de la langue - I can communicate in spite of the language barrier.
+Je me détends - I relax.
+J’adore m’immerger dans une nouvelle culture - I love immersing myself in a new culture.
+Je préfère les vacances actives, j’adore les activités de plein air - I prefer active holidays; I love outdoor activities.
+
+## 27. Weather & Natural Disasters (La météo)
+
+### Les prévisions météo (Forecasts)
+nord/est/sud/ouest - north/east/south/west
+Il y aura du vent sur la moitié nord du pays. - There will be wind in the northern half of the country.
+Il fera beau en région parisienne demain. - It will be sunny in the Paris region tomorrow.
+Il neigera dans les Alpes demain matin. - It will snow in the Alps tomorrow morning.
+Il pleuvra sur tout le pays dans l'après-midi. - It will rain all over the country in the afternoon.
+Un orage a éclaté sur la côte atlantique hier soir. - A storm broke out on the Atlantic coast last night.
+
+### Les catastrophes naturelles (Natural Disasters)
+un blizzard - a blizzard
+un feu de forêt - a forest fire
+un ouragan - a hurricane
+un tremblement de terre - an earthquake
+un tsunami - a tsunami
+une avalanche - an avalanche
+une canicule - a heatwave
+une éruption volcanique - a volcanic eruption
+une inondation - a flood
+une sécheresse - a drought
+une tornade - a tornado
+un glissement de terrain - a landslide
+
+### Phrases idiomatiques (Weather)
+Après la pluie le beau temps. - After the rain comes the good weather.
+Il pleut des cordes. - It's raining cats and dogs.
+Il fait un froid de canard. - It's freezing cold.
+Il y avait un brouillard à couper au couteau. - There was a fog you could cut with a knife.
+Il fait un temps de chien. - The weather is awful.
+Il fait toujours un temps magnifique. - The weather is always beautiful.
+
+### Expressions avec faire et il y a
+Il faisait/il fait/il fera beau. - It was/is/will be fine/nice.
+Il faisait/il fait/il fera chaud. - It was/is/will be hot.
+Il faisait/il fait/il fera mauvais. - It was/is/will be bad.
+Il faisait/il fait/il fera froid. - It was/is/will be cold.
+Il faisait/il fait/il fera doux. - It was/is/will be mild.
+Il pleuvait/il pleut/il pleuvra - It was raining/is raining/will rain
+Il neigeait/il neige/il neigera - It was snowing/is snowing/will snow
+Il gelait/il gèle/il gèlera - It was freezing/is freezing/will freeze
+Il y avait/il y a/il y aura... - There was/is/will be...
+du soleil. - ... sunshine.
+des averses. - ... showers.
+du brouillard. - ... fog.
+des éclaircies. - ... clear spells.
+du tonnerre et des éclairs. - ... thunder and lightning.
+du vent. - ... wind.
+du verglas. - ... black ice.
+
+## 28. Transport & Getting Around (Les transports)
+
+### Les moyens de transport (Modes of Transport)
+l'avion - plane
+le bateau - boat / ship
+le bus - bus
+le camion - lorry/truck
+la camionnette - van
+le car - coach
+le métro - metro/underground
+la moto - motorbike
+le taxi - taxi
+le train - train
+le tramway - tram
+la trottinette électrique - electric scooter
+la voiture - car
+le vélo - bicycle
+le ferry - ferry
+le camping-car - camper van
+la caravane - caravan
+la mobylette - moped
+la navette - shuttle
+
+### Le voyage et la route (Travel Words)
+l'aéroport - airport
+la gare - train station
+la gare routière - bus station
+le port - port
+la station de métro - metro station
+le péage - toll / booth
+circuler - to travel/circulate
+conduire - to drive
+aller à pied - to go on foot
+se déplacer - to get around
+voler - to fly
+voyager - to travel
+faire du vélo - to cycle
+l'arrêt de bus - bus stop
+l'autoroute (f.) - motorway
+le code de la route - highway code
+le couloir d'autobus - bus lane
+une panne - breakdown
+le panneau - signpost
+le permis de conduire - driving licence
+la vitesse - speed
+la carte - map
+le feu rouge - red light
+le feu vert - green light
+la route - road
+le virage - bend
+la station de taxis - taxi rank
+la SNCF - French National Railways
+le TGV - high-speed train
+un passager / une passagère - passenger
+le billet - ticket
+l'aller simple (m.) - single ticket
+l'aller retour (m.) - return ticket
+l'horaire (m.) - timetable
+le tarif - fare
+le bureau des objets trouvés - lost property office
+la rame de métro - underground train carriage
+
+### Phrases idiomatiques (Transport)
+Je vais au lycée à pied avec mon voisin. - I walk to school with my neighbour.
+Je vais au lycée à vélo, sauf s'il pleut. - I go to school by bike, unless it rains.
+Je préfère prendre ma trottinette électrique. - I prefer to take my electric scooter.
+J'adore prendre l'avion, même si ça coûte un bras parfois. - I love flying, even if it costs an arm and a leg sometimes.
+Le père de mon ami m'amène à l’école en voiture tous les jours. - My friend's dad drives me to school every day.
+Je déteste prendre le bus, il est souvent en retard. - I hate taking the bus – it’s often late.
+Mes parents font du covoiturage pour aller au travail. - My parents carpool to work.
+
+## 29. Protecting the Environment & Climate Change
+
+### L'environnement local (Local Environment)
+Il y a toujours des embouteillages/des bouchons, surtout aux heures de pointe. - There are always traffic jams, especially at rush hour.
+Les rues sont sales, il y a des déchets partout. On voit toujours des mégots, des bouteilles vides et des papiers. C'est honteux qu'on n'utilise pas les poubelles publiques. - The streets are dirty – there is rubbish everywhere. You see cigarette butts, empty bottles and papers. It is shameful that people don't use public bins.
+La qualité de l'air est mauvaise à cause des voitures. On ne respire que des gaz d'échappement ! - The air-quality is bad because of cars. You only breathe in exhaust fumes!
+Il manque des pistes cyclables et des zones piétonnes dans ma ville. - There is a lack of cycle lanes and pedestrian areas in my town.
+Le gouvernement doit fournir plus de transports en commun et de pistes cyclables. - The government must provide more public transport and cycle lanes.
+C'est la responsabilité de chaque personne de ne pas jeter d'ordures par terre. - It is the responsibility of each person to not throw rubbish on the ground.
+On peut manifester contre le manque d'installations appropriées pour les cyclistes et les piétons dans les villes. - You can protest the lack of appropriate facilities for cyclists and pedestrians in towns.
+On peut faire des choix responsables à la maison, on peut recycler, économiser de l'eau et conserver de l'énergie. - You can make responsible choices at home: you can recycle, save water and conserve energy.
+
+### L'environnement global (Global Environment)
+Il y a trop d'industries polluantes. Ces industries polluent l'air et l'eau, et contaminent les fleuves, les lacs et les mers. - There are too many polluting industries. These industries pollute the air and the water, and contaminate rivers, lakes and seas.
+Le réchauffement de la planète et la destruction de la couche d'ozone m'inquiètent beaucoup. - Global warming and the destruction of the ozone layer worry me a lot.
+Il y a beaucoup d'espèces en voie de disparition car ils ne peuvent plus survivre. - There are a lot of endangered species because they can no longer survive.
+La déforestation et la perte de biodiversité sont très préoccupantes. - Deforestation and the loss of biodiversity are very worrying.
+Tous les pays doivent réduire leur empreinte carbone. - Every country must reduce its carbon footprint.
+Il faut investir plus dans la protection de l'environnement. - It is necessary to invest more in the protection of the environment.
+Le développement durable est essentiel pour protéger la planète. - Sustainable development is essential to protect the planet.
+Nous devons adopter des sources d'énergie renouvelables. - We must adopt renewable sources of energy.
+
+### Le changement climatique (Climate Change)
+Il y a des catastrophes naturelles plus fréquentes, comme des canicules prolongées, des ouragans, des inondations ou des sécheresses. - There are more frequent natural disasters, like prolonged heatwaves, hurricanes, floods or droughts.
+Les températures globales sont plus élevées, ce qui menace la biodiversité et les écosystèmes. - The global temperatures are higher, which threatens biodiversity and ecosystems.
+Les événements climatiques extrêmes sont dangereux et tragiques, beaucoup de gens meurent. - Extreme climate events are tragic and dangerous – a lot of people die.
+Le changement climatique rend des lieux inhabitables et certaines personnes doivent migrer. - Climate change makes places uninhabitable and certain people have to migrate.
+
+### Solutions et phrases idiomatiques
+L'éducation est essentielle. Il faut que tout le monde comprenne la sévérité de ces problèmes et passe à l'action. - Education is essential. It is necessary that everyone understands the severity of these problems and takes action.
+Il faut élire des hommes et des femmes politiques qui se sentent concernés par le changement climatique. - It is essential to elect politicians who are concerned about climate change.
+Il faut que tous les gouvernements s'accordent sur le fait que le changement climatique est une urgence, et qu'ils agissent. - It is necessary that all governments agree that climate change is an emergency, and that they act.
+Nous devons tous faire de meilleurs choix écologiques à la maison, au travail et en général. - We must all make better environmentally friendly choices at home, at work and in general.
+Je manifeste pour sensibiliser les gens à l'urgence climatique. - I protest to raise people's awareness of the climate emergency.
+Je prends les transports en commun ou mon vélo le plus souvent possible. - I take public transport or my bicycle as often as possible.
+Je n'achète pas beaucoup de vêtements, je comprends que le fast-fashion est très nuisible pour l'environnement. - I don't buy a lot of clothes – I understand that fast fashion is very damaging for the environment.
+Je recycle toujours le carton, le papier, le verre et le plastique. - I always recycle cardboard, paper, glass and plastic.
+
+## 30. Informal Letter & Email Phrases
+
+### Beginning (Beginning)
+Merci beaucoup pour ta gentille lettre qui est arrivée hier. - Many thanks for your kind letter, which arrived yesterday.
+J'étais ravi(e) de recevoir ta lettre. - I was delighted to receive your letter.
+Quelle belle surprise, j'ai reçu ta lettre la semaine dernière. - What a lovely surprise, I received your letter last week.
+J'étais très content(e) d'avoir de tes nouvelles. - I was very happy to hear how you are getting on.
+
+### Expressing thanks (Expressing thanks)
+Je te remercie pour la carte d'anniversaire. - Many thanks for the birthday card.
+Merci mille fois pour ton gentil cadeau. - Thanks a million for your kind present.
+Ton cadeau m'a fait vraiment plaisir. - I was delighted with your present.
+C'était très gentil de ta part. - That was very kind of you.
+Merci pour le petit colis. J'adore le livre. Je l'ai lu le week-end dernier - Thank you for the little parcel. I love the book. I read it last weekend.
+
+### Saying how you are (Saying how you are)
+J'espère que tu vas bien. Moi, ça va très bien, je suis en pleine forme. - I hope that you are well. I’m doing well and am in great form.
+Alors comment vas-tu, mon ami(e) ? - So, my friend, how are you?
+Moi, ça va bien en ce moment. - I’m doing great at the moment.
+Quoi de neuf ? Pas grand-chose de nouveau ici ! - What’s new? Nothing much happening here!
+Ça ne va pas très bien. J'en ai marre de tout ! - I’m not doing so well. I’m fed up with everything!
+
+### Invitations
+Est-ce que tu veux venir passer quelques semaines chez moi en Irlande ? - Would you like to come and spend a few weeks with me in Ireland?
+Ça te dit de venir chez moi pendant les vacances d'été/de Noël/de Pâques ? - Would you like to visit me during the summer/Christmas/Easter holidays?
+Je t'invite à passer tes vacances en Irlande dans ma famille. - I’m inviting you to spend your holidays with my family in Ireland.
+Merci beaucoup pour ta gentille invitation. Je serais ravi(e) de venir chez toi. - Thanks a lot for your kind invitation. I would be delighted to stay with you.
+J'accepte ton invitation avec plaisir et j'attends ma visite en France avec impatience. - I am delighted to accept your invitation and am looking forward to visiting France.
+Je suis vraiment désolé(e), mais je ne peux pas venir chez toi cet été. - I am very sorry, but I cannot come and stay with you this summer.
+Je ne peux pas accepter ton invitation car je n'ai pas assez d'argent et je dois travailler pendant le mois de juillet. C'est dommage ! - I cannot accept your invitation, as I do not have enough money and have to work during July. It’s a shame !
+
+### Discussing plans
+Je vais vraiment faire la fête pour mon anniversaire. - I’m really going to party for my birthday.
+J'organise une grande fête chez moi. Ce sera extra. - I’m organising a big party at my house. It’s going to be amazing.
+Après les examens, j'ai envie de voyager un peu. J'aimerais bien passer quelques semaines avec toi en France. - After the exams, I want to travel a bit. I would like to spend a few weeks with you in France.
+Avant de partir en vacances, il faut que je trouve un petit boulot pour le mois de juin. J'ai besoin de gagner de l'argent. - Before I go on holiday, I need to find a job for June. I need to earn some money.
+Quand tu viendras à Dublin, il y aura beaucoup de choses à faire. Dublin est une ville très branchée avec plein de bons plans pour sortir et de supers boîtes. - When you come to Dublin, there will be lots to do. Dublin is a trendy city with amazing things to do and super nightclubs.
+Quels sont vos projets pour ce week-end/cet été ? - What are your plans for this weekend/this summer?
+Qu'est-ce que tu vas faire pour fêter ton anniversaire ? - How are you going to celebrate your birthday?
+Est-ce que tu as un petit boulot pour l'été ? - Do you have a summer job?
+Qu'est-ce que tu vas faire après les examens ? - What are you going to do after the exams?
+
+### Greetings and Signing off
+Bon anniversaire/joyeux anniversaire. - Happy birthday.
+Joyeux Noël et Bonne Année ! - Merry Christmas and a Happy New Year!
+Joyeuses Pâques ! - Happy Easter!
+Félicitations ! Mes meilleurs vœux. - Congratulations! Best wishes.
+Bon courage ! - Good luck!
+Dis bonjour à ta famille de ma part. - Say hello to your family for me.
+Voici toutes mes nouvelles. J'attends ta prochaine lettre avec impatience. - That's all my news. I look forward to your next letter.
+J'attends de tes nouvelles/ta réponse avec impatience. Écris-moi vite ! - I look forward to hearing your news/your response. Write to me soon!
+Amitiés/À bientôt/Bises ! - Your friend/See you soon/Hugs and kisses!
+
+## 31. Health & Health Problems (La santé)
+
+### Vocabulaire de la santé
+être en bonne santé - to be healthy
+être en mauvaise santé - to be unhealthy
+être malade - to be sick
+la santé mentale - mental health
+suivre une thérapie - to go to therapy
+un thérapeute / une thérapeute - a therapist
+neurotypique - neurotypical
+neurodivergent(e) - neurodivergent
+avoir mal - to be in pain
+les maladies - illnesses / disease
+se casser le bras/la jambe - to break your arm/leg
+tomber malade - to fall ill
+se sentir mieux - to feel better
+se rétablir / guérir - to recover / heal
+se faire mal à - to hurt yourself
+se blesser / être blessé(e) - to injure yourself / be injured
+chercher de l'aide - to seek help
+traiter / un traitement - to treat / a treatment
+être fatigué(e) - to be tired
+être épuisé(e) - to be exhausted
+s'évanouir - to faint
+éternuer - to sneeze
+vomir - to vomit
+un bleu - a bruise
+une coupure - a cut
+une cicatrice - a scar
+
+### Les problèmes de santé (Specific issues)
+attraper un coup de soleil - to get sunburned
+avoir une angine - to have a sore throat/tonsillitis
+avoir mal à la gorge - to have a sore throat
+avoir la grippe - to have the flu
+avoir mal aux dents - to have a toothache
+avoir de la fièvre - to have a fever
+tousser - to cough
+un virus - a virus
+une ampoule - a blister
+une brûlure - a burn
+être diabétique - to be diabetic
+être enrhumé - to have a cold
+être allergique à / une allergie - to be allergic to / an allergy
+le rhume des foins - hayfever
+être atteint d'un cancer - to have cancer
+avoir de l'asthme - to have asthma
+faire une dépression - to have depression
+la douleur - the pain
+une épidémie - an epidemic
+une pandémie - a pandemic
+la COVID-19 - Covid-19
+le confinement - lockdown
+ne pas avoir le moral - to be feeling low
+se sentir déprimé(e) - to feel depressed
+se sentir dépassé(e) - to feel overwhelmed
+être stressé(e) - to be stressed
+être anxieux/anxieuse - to be anxious
+la rougeole - measles
+les oreillons (m.) - mumps
+la varicelle - chickenpox
+une crise d'appendicite - appendicitis
+une crise cardiaque - heart attack
+le sida - AIDS
+
+## 32. At the Doctor, Pharmacy & Body Parts
+
+### Chez le médecin (At the Doctor's)
+prendre rendez-vous chez le médecin - to have an appointment with the doctor
+le cabinet médical - the doctor's surgery
+le médecin généraliste - the GP
+la salle d'attente - the waiting room
+l'infirmier/infirmière - the nurse
+la piqûre / injection - the injection
+aller aux urgences - to go to the emergency room (A&E)
+soigner - to treat
+des béquilles - crutches
+une prise de sang - a blood test
+une ordonnance - a prescription
+les médicaments - medication
+des comprimés / cachets - tablets
+un vaccin - a vaccine
+le SAMU - emergency ambulance service
+le chirurgien / la chirurgienne - surgeon
+
+### La pharmacie (The Pharmacy)
+un(e) pharmacien(ne) - a pharmacist
+le maquillage - make-up
+un médicament - medicine
+des mouchoirs - tissues
+un pansement - plaster
+une crème solaire - suncream
+un antibiotique - antibiotic
+un sirop pour la toux - cough syrup
+le parfum - perfume
+l'après-rasage - aftershave
+la crème hydratante - moisturiser
+le baume à lèvres - lip balm
+le gel désinfectant - hand sanitiser
+les pastilles pour la gorge - throat lozenges
+le somnifère - sleeping tablet
+rester au lit pendant une semaine - to stay in bed for a week
+mettre une crème - to put a cream
+aller à l'hôpital - to go to the hospital
+boire beaucoup d'eau - to drink a lot of water
+
+### Les parties du corps (The Human Body)
+la tête - head
+le visage - face
+le nez - nose
+la bouche - mouth
+le cou - neck
+le front - forehead
+les yeux (un œil) - eyes (an eye)
+l'oreille - ear
+les dents - teeth
+le menton - chin
+la gorge - throat
+le dos - back
+le poignet - wrist
+le derrière - bottom
+la jambe - leg
+le pied - foot
+l'orteil - toe
+l'épaule - shoulder
+le bras - arm
+le doigt - finger
+la main - hand
+le ventre / l'estomac - stomach
+la cuisse - thigh
+le genou - knee
+le talon - heel
+le crâne - skull
+la mâchoire - jaw
+la narine - nostril
+la joue - cheek
+les pommettes (f.) - cheekbones
+la paupière - eyelid
+le sourcil - eyebrow
+le cil - eyelash
+les lèvres (f.) - lips
+la langue - tongue
+une barbe - beard
+une moustache - moustache
+une frange - fringe
+la poitrine - chest
+la colonne vertébrale - spine
+les seins (m.) - breasts
+une côte - rib
+le mollet - calf
+la cheville - ankle
+le sang - blood
+la peau - skin
+un os - bone
+le muscle - muscle
+un rein - kidney
+le cerveau - brain
+le cœur - heart
+les poumons (m.) - lungs
+le foie - liver
+
+### Phrases idiomatiques (Health)
+Quand je me sens fatigué(e), j'annule mes sorties, je me repose et je me couche tôt. - When I feel tired, I cancel my outings, I rest and I go to bed early.
+Si j’ai mal à la tête, je bois beaucoup d’eau et j’évite les écrans. - If I have a headache, I drink a lot of water and I avoid screens.
+Si j’ai la grippe, je reste au lit et je dors le plus possible. - If I have the flu, I stay in bed and I sleep as much as possible.
+Quand je suis malade, je vais chez le médecin et je prends des médicaments. - When I am sick, I go to the doctor and I take medicine.
+Quand je me sens anxieux/anxieuse, je parle avec mes amis ou je me promène au parc. - When I feel anxious, I speak with my friends or I go for a walk in the park.
+Si je me blesse pendant le sport, je mets de la glace sur la zone et je me repose. - If I injure myself during sport, I put ice on the area and I rest.
+Je suis neurodivergent(e), alors parfois, les choses simples me demandent beaucoup d'efforts. - I am neurodivergent, so sometimes simple things take a lot of effort.
+
+## 33. Nutrition & Food (L'alimentation)
+
+### Les aliments (Food Items)
+le beurre - butter
+les bonbons - sweets
+le café - coffee
+le canard - duck
+les carottes - carrots
+la charcuterie - deli meats
+les chips - crisps
+le chocolat - chocolate
+le chou - cabbage
+la crème - cream
+la crème caramel - creme caramel
+les crevettes - prawns
+le croissant - croissant
+l'eau - water
+les frites - chips/fries
+le fromage - cheese
+le gâteau - cake
+la glace - ice cream
+les haricots verts - green beans
+les huîtres - oysters
+le jambon - ham
+le lait - milk
+les moules - mussels
+les noix - nuts
+l'oignon - onion
+l'orange - orange
+le pain - bread
+le pain au chocolat - pain au chocolat
+les pâtes - pasta
+la pizza - pizza
+la pomme de terre - potato
+le poulet - chicken
+le poivron - pepper
+le riz - rice
+la salade - salad
+le saumon - salmon
+la tomate - tomato
+le porc - pork
+le mouton - mutton
+l'agneau (m.) - lamb
+la volaille - poultry
+une oie - goose
+la dinde - turkey
+un lapin - rabbit
+une saucisse - sausage
+le poisson - fish
+le thon - tuna
+la morue - cod
+la truite - trout
+les fruits de mer (m.) - seafood
+les crustacés (m.) - shellfish
+un crabe - crab
+un homard - lobster
+une coquille Saint-Jacques - scallop
+les légumes (m.) - vegetables
+des petits pois (m.) - peas
+un chou-fleur - cauliflower
+un navet - turnip
+un poireau - leek
+le céleri - celery
+un concombre - cucumber
+une citrouille - pumpkin
+une laitue - lettuce
+les fruits (m.) - fruit
+une pomme - apple
+une poire - pear
+une pêche - peach
+un abricot - apricot
+un pruneau - prune
+le raisin - grape
+un raisin sec - raisin
+une fraise - strawberry
+une framboise - raspberry
+une myrtille - blueberry
+un citron - lemon
+un œuf - egg
+les produits laitiers (m.) - dairy products
+le fromage de chèvre - goat's cheese
+un yaourt - yoghurt
+les produits biologiques - organic food
+les produits surgelés - frozen food
+les produits diététiques - health food
+l'eau gazeuse - sparkling water
+l'eau plate - still water
+l'eau minérale - mineral water
+le chocolat chaud - hot chocolate
+la limonade - lemonade
+le vin rouge - red wine
+le vin blanc - white wine
+la bière - beer
+le cidre - cider
+
+### Bien manger (Eating Well)
+manger trois repas équilibrés par jour - to eat three balanced meals a day
+manger cinq fruits et légumes par jour - to eat five portions of fruit and vegetables a day
+prendre le petit déjeuner - to have breakfast
+prendre son déjeuner - to have lunch
+prendre son dîner - to have dinner
+le goûter - snack
+rester en forme - to stay in shape/fit
+être au régime - to be on a diet
+manger équilibré - to eat a balanced diet
+manger sain - to eat healthily
+éviter de grignoter entre les repas - to avoid snacking between meals
+être en surpoids - to be overweight
+être végétarien(ne) - to be vegetarian
+être végan(e) - to be vegan
+éviter la malbouffe - to avoid junk food
+commander moins de plats à emporter - to order fewer take aways
+
+### Phrases Idiomatiques (Nutrition)
+Je ne saute jamais le petit déjeuner, on dit que c'est le repas le plus important de la journée. - I never skip breakfast, they say that it is the most important meal of the day.
+J'évite la malbouffe et j'essaie de manger trois repas équilibrés chaque jour. - I avoid junk food and I try to eat three balanced meals a day.
+J'ai un faible pour le sucré, mais je mange du chocolat avec modération. - I have a sweet tooth, but I eat chocolate in moderation.
+Je suis végétarien(ne) donc je mange une grande variété de fruits et de légumes. - I am vegetarian, so I eat a large variety of fruit and vegetables.
+Je bois beaucoup d'eau et je ne bois pas beaucoup de sodas. - I drink a lot of water and I don't drink a lot of fizzy drinks.
+Je n'aime pas manger de légumes, mais je sais que c'est nécessaire pour être en bonne santé. - I don't like to eat vegetables, but I know that it is necessary to be healthy.
+
+## 34. Addictions & Substance Abuse (Les addictions chez les jeunes)
+
+### Vocabulaire des addictions
+L’addiction / la dépendance - Addiction
+Être accro / dépendant(e) - To be addicted to
+Provoquer une dépendance - To create an addiction
+Le syndrome de manque - Withdrawal symptoms
+Une substance toxique - A toxic substance
+Le fléau de la société - The scourge of society
+La lutte contre... - The struggle / fight against ...
+Un problème croissant - A growing problem
+La pression du groupe - Peer pressure
+Se désinhiber - To lose one's inhibitions
+S'évader du quotidien - To escape from daily life
+Pour échapper à l’ennui - To escape the boredom
+Un moyen d’évasion - A way to escape
+Se passer de - To do without
+
+### L’abus d’alcool
+Boire avec modération - To drink with moderation
+Boire à l’excès / excessivement - To drink to excess / excessively
+La biture express / le binge-drinking - Binge drinking
+Être soûl(e) / saoul(e) / ivre - To be drunk
+Se soûler / s'enivrer - To get drunk
+Avoir la gueule de bois - To be hungover
+L’alcoolisme - Alcoholism
+Un(e) alcoolique - An alcoholic
+Un buveur / une buveuse - A drinker
+La bière sans alcool - Alcohol-free beer
+Capitaine de soirée - A designated driver
+
+### Le tabac et le vapotage
+Le tabagisme - Addiction to cigarettes
+Un fumeur / une fumeuse - A smoker
+Une cigarette / une clope (fam.) - A cigarette
+Une vapoteuse - A vape
+Le vapotage - Vaping
+Vapoter - To vape
+Tousser - To cough
+Arrêter de fumer - To quit smoking
+Des problèmes respiratoires - Breathing problems
+Être nocif(ve) pour / nuisible à la santé - To be harmful to your health
+Le cancer du poumon - Lung cancer
+Une habitude dégoûtante - Disgusting habit
+Fumer comme un pompier - To smoke like a chimney
+
+### La drogue
+Un stupéfiant / un drogue - A narcotic / a drug
+Les drogues dures / douces - Hard/soft drugs
+La consommation de drogues douces - Recreational drug use
+Fumer du cannabis - To smoke cannabis
+Sniffer de la cocaïne - To snort cocaine
+S’injecter de l’héroïne - To inject heroin
+Prendre un comprimé - To take a pill
+Abuser des drogues - To abuse drugs
+La toxicomanie - Drug addiction
+Un(e) toxicomane / un(e) drogué(e) - A drug addict
+Prendre de la drogue - To take drugs
+Se droguer - To take drugs / be on drugs
+Planer - To get high
+Un revendeur de drogue / un trafiquant - A drug dealer / trafficker
+Une overdose - An overdose
+Se désintoxiquer - To detox
+Une cure de désintoxication - Detox/rehab
+Rester sobre - To stay sober
+Le trafic de drogue - Drug trafficking
+
+### Phrases idiomatiques (Addictions)
+Boire de l’alcool à l’excès a de nombreuses conséquences négatives pour la santé mentale et physique - Drinking to excess has numerous negative consequences for physical and mental health
+Se soûler régulièrement endommage le foie et peut mener à des maladies sérieuses - Getting drunk regularly damages the liver and can lead to serious illnesses
+L’alcool peut nuire à nos capacités de raisonnement - Alcohol can damage your reasoning skills
+Le tabagisme est responsable de nombreuses maladies graves - Smoking is responsible for numerous serious illnesses
+La nicotine dans les cigarettes et les vapoteuses est très addictive - Nicotine in cigarettes and vapes is very addictive
+Les vapoteuses contiennent des substances chimiques qui endommagent les poumons - Vapes contain chemical substances that damage lungs
+Les jeunes gens se droguent pour oublier leurs soucis - Young people take drugs to forget their troubles
+La drogue est devenue le fléau de la société irlandaise moderne - Drugs have become the scourge of modern Irish society
+Le trafic de drogue est souvent lié à la montée de la criminalité - Drug trafficking is often linked to a rise in crime
+
+## 35. Technology & IT (L'informatique et les réseaux sociaux)
+
+### L'équipement et les applications (IT Hardware/Software)
+Un ordinateur (ordi) - A computer
+Un ordinateur portable - A laptop
+Un clavier - A keyboard
+Une souris - A mouse
+Un écran (tactile) - A (touch) screen / monitor
+Un iPad / une tablette - An iPad / a tablet
+Un portable / Un smartphone - A mobile / A smartphone
+Un lecteur - A drive
+Une clé USB - A USB key
+Une imprimante - A printer
+Un disque dur - A hard disk
+Taper - To type
+Se connecter / se déconnecter - To log on / log off
+Le mot de passe - Password
+Temps d'écran - Screentime
+Regarder en streaming / le flux continu - To stream / streaming
+Les écouteurs - Headphones
+Sans fil - Wireless
+Télécharger - To download
+Éteindre / Allumer - To switch off / To switch on
+La nomophobie - Nomophobia (fear of not having a working phone)
+Un selfie - A selfie
+Un filtre / un effet - A filter / an effect
+Numérique - Digital
+Le logiciel - Software
+
+### Les réseaux sociaux et Internet
+Un réseau social - A social network
+Un site web - A website
+Une page d'accueil - A home page
+Un moteur de recherche - A search engine
+Un courriel / un email - An email
+Une boîte de réception - An inbox
+Envoyer un email - To send an email / to email
+Une boutique en ligne - An online shop
+Un fournisseur - An internet service provider
+Naviguer / surfer sur Internet - To browse / surf the internet
+Créer des vidéos / poster une vidéo - Create videos / Post a video
+Écouter un podcast - Listen to a podcast
+Écrire un commentaire - Write a comment
+Partager une vidéo - Share a video
+Mettre des « likes » - To like / put likes
+Un jeu vidéo - Video game
+La cyber-criminalité - Cyber-crime
+
+### L'intelligence artificielle (IA)
+L'IA est une technologie qui imite l'intelligence humaine - AI is a technology that mimics human intelligence
+L'IA peut aider à résoudre des problèmes complexes rapidement - AI can help solve complex problems quickly
+Les voitures autonomes fonctionnent grâce à l'IA - Self-driving cars use AI to move around
+Des assistants vocaux utilisent l'IA - Voice assistants use AI
+Les traducteurs automatiques utilisent l'IA - Machine translators use AI
+Sites comme ChatGPT peuvent immédiatement donner beaucoup d'information - Sites like ChatGPT can immediately give a lot of information
+
+### Le cyber harcèlement (Cyberbullying)
+Le cyberharcèlement est une forme de harcèlement pratiqué en ligne - Cyberbullying is a form of harassment that occurs online
+Le cyberharcèlement inclut des insultes, des menaces, ou des messages blessants - Cyberbullying includes insults, threats, or hurtful messages
+Les victimes peuvent se sentir isolées et avoir peur de demander de l'aide - Victims often feel isolated and afraid to seek help
+Le cyberharcèlement peut avoir des conséquences sérieuses comme l'anxiété - Cyberbullying can have serious consequences such as anxiety
+La loi protège les victimes de cyberharcèlement - The law protects victims of cyberbullying
+
+### Phrases idiomatiques (Technology)
+La technologie joue un rôle très important dans ma vie - Technology plays a very important role in my life
+L'IA est un outil puissant et impressionnant - AI is a powerful and impressive tool
+Cependant c'est inquiétant que l'IA puisse remplacer certains emplois - However, it is worrying that AI could replace some jobs
+Je dois avouer que je suis accro à l’écran - I must admit that I am addicted to the screen
+Le cyberharcèlement est un grand problème de nos jours - Cyberbullying is a big problem nowadays
+
+## 36. Social Problems & Racism (Les problèmes sociaux)
+
+### La pauvreté (Poverty)
+La pauvreté intergénérationnelle - Intergenerational poverty
+La crise financière - The financial crisis
+Un cercle vicieux de pauvreté - A vicious cycle of poverty
+Le SMIC - The minimum wage
+Le fossé entre les riches et les pauvres - The gap between the rich and the poor
+Le chômage - Unemployment
+La précarité - Instability/precariousness
+Le taux de chômage - The rate of unemployment
+L'extrême pauvreté - Extreme poverty
+Un chômeur / une chômeuse - An unemployed person
+Vivre en dessous du seuil de pauvreté - To live below the poverty line
+Le revenu de solidarité active (RSA) - Tax credits
+Les quartiers défavorisés - Disadvantaged areas
+Les inégalités sociales - Social inequalities
+Vivre en marge de la société - To live on the margins of society
+L'aide sociale - Social welfare
+
+### Le racisme et l'exclusion
+La discrimination - Discrimination
+Le préjugé - Prejudice
+Maltraiter quelqu'un - To treat someone badly
+Le comportement raciste - Racist behaviour
+Les insultes racistes - Racist slurs
+Les menaces - Threats
+Un sens de supériorité - A sense of superiority
+La haine - Hatred
+L'intégration des immigrés - The integration of immigrants
+L'inclusion sociale - Social inclusion
+La diversité culturelle - Cultural diversity
+Le multiculturalisme - Multiculturalism
+La ségrégation - Segregation
+L'oppression - Oppression
+La lutte contre le racisme - Fight against racism
+La tolérance - Tolerance
+Le respect mutuel - Mutual respect
+
+### Phrases Idiomatiques (Social Problems)
+Le fossé entre les riches et les pauvres continue de grandir - The gap between rich and poor continues to grow
+Le chômage touche surtout les jeunes - Unemployment mainly affects young people
+L'extrême pauvreté peut créer un cercle vicieux - Extreme poverty can create a vicious cycle
+Le coût de la vie augmente, mais les salaires ne suivent pas - The cost of living is increasing, but wages are not keeping up
+Il y a encore trop de discrimination contre certaines communautés - There is still too much discrimination against certain communities
+Tout le monde mérite d'être respecté - Everyone deserves to be respected
+Certaines familles ont du mal à joindre les deux bouts - Some families struggle to make ends meet
+
+## 37. Global Action & Volunteering (Agir pour un monde meilleur)
+
+### Le bénévolat (Volunteering)
+Un(e) bénévole - A volunteer
+Venir en aide - To come to the aid of
+Faire du bénévolat - To volunteer
+La faim - Hunger
+Aider les moins fortunés - To help the less fortunate
+La guerre - War
+Sensibiliser - To raise awareness
+Les catastrophes naturelles - Natural catastrophes
+Une association caritative - A charitable organisation
+Une collecte de fonds - Fundraising
+Une organisation humanitaire - A humanitarian organisation
+Événement caritatif - Charity event
+
+### L’action climatique (Climate Action)
+Réduire son empreinte carbone - To reduce your carbon footprint
+Conserver l'énergie - To save energy
+Recycler - To recycle
+Consommer moins - To consume less
+Acheter moins de vêtements - To buy less clothing
+Acheter des vêtements d'occasion - Buy second-hand clothing
+Manifester - To protest
+La transition verte - The green transition
+Les sources d’énergie renouvelable - Sources of renewable energy
+L’énergie solaire - Solar energy
+Les panneaux solaires - Solar panels
+Les parcs éoliens - Wind farms
+Les voitures électriques - Electric cars
+Ne plus dépendre des combustibles fossiles - To no longer depend on fossil fuels
+
+### Phrases idiomatiques (Global Action)
+Les organisations environnementales sensibilisent les gens à la crise climatique - Environmental organisations raise awareness about the climate crisis
+Les bénévoles offrent des repas chauds et des vêtements aux sans-abris - Volunteers provide hot meals and clothing to homeless people
+Faire du bénévolat est un moyen de lutter contre la pauvreté - Volunteering is a way to combat poverty
+Nous devons tous faire de meilleurs choix écologiques - We must all make better environmentally friendly choices
+
+## 38. Politics & Democracy (La politique)
+
+### Le droit de vote
+Voter - To vote
+Un référendum - A referendum
+Le suffrage universel - Universal suffrage
+Une élection - An election
+Les élections générales - General elections
+Un électeur / une électrice - A voter
+Aller aux urnes - To go to the polls
+Une campagne électorale - An election campaign
+Un(e) candidat(e) - A candidate
+Le bureau de vote - The polling station
+Un parti politique - A political party
+
+### La démocratie
+Le parlement - Parliament
+Le gouvernement - The government
+Les hommes / femmes politiques - Politicians
+Le ministre - The minister
+Le premier ministre - The prime minister
+Un député / une députée - A member of parliament
+Le président - The president
+La loi - The law
+Les socialistes - The socialists
+Les conservateurs - The conservatives
+La liberté d'expression - Freedom of expression
+Un citoyen / une citoyenne - A citizen
+L'extrême droite - The extreme right
+
+### La politique internationale
+L'Union européenne (UE) - The European Union (EU)
+L'Organisation des nations unies (ONU) - The United Nations (UN)
+Les droits de l'homme - Human rights
+Les élections européennes - The European elections
+Les élections présidentielles - The presidential elections
+La diplomatie - Diplomacy
+Les chefs d'état - Heads of state
+Un ambassadeur / une ambassadrice - An ambassador
+Les traités internationaux - International treaties
+Un conflit - A conflict
+
+### L'engagement politique
+Les affaires publiques - Public affairs
+Se joindre à un parti politique - Joining a political party
+S'inscrire pour voter - Registering to vote
+L'égalité des sexes - Gender equality
+Manifester - Protesting
+Débattre - Debating
+Une campagne - Campaigning
+Sensibiliser les gens aux causes sociales et politiques - Raising awareness of social and political causes
+La justice sociale - Social justice
+La promotion - Advocacy
+
+### Phrases idiomatiques (Politics)
+De nos jours beaucoup de jeunes s'impliquent dans la politique - Nowadays many young people get involved in politics
+Ils utilisent les réseaux sociaux pour sensibiliser aux causes politiques - They use social media to raise awareness about political causes
+Les jeunes dénoncent les discriminations et les violences - Young people speak out against discrimination and violence
+Les jeunes veulent une société plus égale et inclusive - Young people want a more equal and inclusive society
+
+## 39. Animals (Les animaux)
+
+### Animaux de compagnie (Pets)
+un animal de compagnie - a pet
+un chien - a dog
+promener le chien - to walk the dog
+aboyer - to bark
+mordre - to bite
+un chiot - a puppy
+un chat - a cat
+un chaton - a kitten
+une souris - a mouse
+un poisson rouge - a goldfish
+
+### Animaux de la ferme (Farm Animals)
+les animaux (m.) de la ferme - farm animals
+une vache - a cow
+un veau - a calf
+le bétail - cattle
+un taureau - a bull
+un mouton - a sheep
+un agneau - a lamb
+un cheval - a horse
+une chèvre - a goat
+un lapin - a rabbit
+une oie - a goose
+une dinde - a turkey
+
+### Animaux sauvages (Wild Animals)
+les animaux sauvages (m.) - wild animals
+sauvage - wild
+un tigre - a tiger
+un léopard - a leopard
+une panthère - a panther
+un chameau - a camel
+un singe - a monkey
+un éléphant - an elephant
+un écureuil - a squirrel
+un loup - a wolf
+un ours - a bear
+un poisson - a fish
+une tortue - a turtle
+une grenouille - a frog
+un crapaud - a toad
+une pieuvre - an octopus
+un phoque - a seal
+un requin - a shark
+une baleine - a whale
+
+### Vocabulaire Anatomique (Animal Parts)
+la queue - the tail
+une patte - a paw
+une griffe - a claw
+
+### Phrases idiomatiques
+Attention au chien / Chien méchant ! - Beware of the dog!
+
+## 40. Time & Frequency (Le temps)
+
+### Les unités de temps (Time Units)
+une seconde - a second
+une minute - a minute
+une heure - an hour
+un quart d'heure - a quarter of an hour
+une demi-heure - half an hour
+trois quarts d'heure - three-quarters of an hour
+une heure et demie - an hour and a half
+un jour / une journée - a day
+un matin / une matinée - a morning
+un(e) après-midi - an afternoon
+une soirée - an evening
+une nuit - a night
+une quinzaine - a fortnight
+un an / une année - a year
+une décennie - a decade
+un siècle - a century
+un millénaire - a millennium
+
+### Repères temporels (Time Markers)
+hier - yesterday
+aujourd'hui - today
+demain - tomorrow
+hier soir - yesterday evening
+ce matin - this morning
+à midi - at noon
+le passé - the past
+le présent - the present
+l'avenir (m.) - the future
+maintenant - now
+bientôt - soon
+plus tard - later
+le lendemain - the next day
+le lendemain matin - the next morning
+
+### La Fréquence (Frequency)
+encore - again
+jamais - never
+souvent - often
+toujours - always
+rarement - rarely
+de temps en temps - from time to time
+quelquefois - sometimes
+après - afterwards / after
+ensuite - then / next
+tout le temps - all the time
+une fois par jour - once a day
+tous les jours - every day
+toute la nuit - all night
+à partir de samedi - starting from Saturday
+le(s) week-end(s) - at weekends
+la semaine dernière - last week
+la semaine prochaine - next week
+
+### La ponctualité
+être en avance - to be early
+être en retard - to be late
+être à l'heure - to be on time
+
+## 41. Education & School Life (La vie scolaire)
+
+### Les écoles (Types of Schools)
+une école maternelle - nursery school
+une école primaire - primary school
+une école secondaire - secondary school
+un collège - junior high school
+un lycée - senior high school
+une université / la fac - university / college
+un internat - a boarding school
+une école gaélophone - an Irish-speaking school
+une école mixte - a co-educational school
+une école de filles / de garçons - a girls' / boys' school
+une école privée - private school
+une école publique - state school
+
+### Le personnel et les élèves (People)
+les professeurs (profs) - teachers
+un(e) professeur - secondary school teacher
+l'instituteur / l'institutrice - primary school teacher
+le directeur / la directrice / le proviseur - principal / headteacher
+les élèves - students / pupils
+un écolier / une écolière - schoolboy / schoolgirl
+un(e) étudiant(e) - college student
+un(e) pensionnaire - boarder
+les collègues - colleagues
+
+### Installations et matériel (Facilities/Equipment)
+bien équipé(e) / mal équipé(e) - well-equipped / poorly equipped
+un nouvel / ancien immeuble - a new / old building
+les salles de classe - classrooms
+le tableau blanc - whiteboard
+le projecteur - projector
+la salle d'informatique - computer room
+la salle de musique - music room
+les laboratoires (labos) - laboratories
+la bibliothèque - library
+la cantine - canteen
+la cuisine - kitchen
+la cour - yard
+le gymnase - gym
+le terrain de football / hockey - football / hockey pitch
+la salle des professeurs - staff room
+l'infirmerie (f.) / sickbay - sickbay
+un labo de langues - language lab
+une trousse - pencil case
+un cahier - copybook
+un stylo - pen
+un crayon - pencil
+une gomme - eraser
+une règle - ruler
+une calculatrice - calculator
+une chemise - folder
+un manuel scolaire - textbook
+
+### Réussite et examens (Success/Exams)
+l'examen (m.) - exam
+l'examen blanc - mock exam
+réviser - to revise
+passer un examen - to take an exam
+passer le brevet - to sit the Junior Cycle exam
+passer le bac - to sit the Leaving Cert
+avoir son bac - to pass the Leaving Cert
+une note - grade / mark
+réussir un examen - to pass an exam
+rater un examen - to fail an exam
+un bulletin scolaire - school report
+être doué(e) pour les études - to be academically gifted
+être bon(ne) / nul(le) en maths - to be good / hopeless at maths
+apprendre par cœur - to learn by heart
+sécher un cours - to skip a class
+abandonner ses études - to drop out
+redoubler - to repeat a year
+être en terminale - to be in 6th Year
+
+### Phrases idiomatiques (School Life)
+Je passe toujours de bons moments à l’école. - I always have a good time at school.
+Je m’entends à merveille avec tous mes professeurs. - I get along really well with all my teachers.
+Ils nous donnent un tas de devoirs. - They give us a lot of homework.
+J’ai du mal à finir tous mes devoirs chaque jour, il y en a trop ! - I have a hard time completing all my homework every day, there is too much!
+Quand on voit le directeur, on marche sur des œufs. - When we see the principal, we walk on eggshells.
+Cette matière - c'est du gâteau ! - This subject – it’s a piece of cake!
+
+## 42. School Subjects (Les matières scolaires)
+
+### Les matières
+l'anglais - English
+l'allemand - German
+les arts ménagers - home economics
+les arts plastiques / le dessin - art / visual arts
+la biologie - biology
+le commerce - business
+la comptabilité - accounting
+la chimie - chemistry
+le dessin industriel - technical drawing
+l'économie - economics
+l'éducation civique, juridique et sociale (ECJS) - CSPE / civics
+l'éducation physique et sportive (EPS) - PE
+l'espagnol - Spanish
+le français - French
+le gaélique - Gaelic
+la physique - physics
+la géographie (la géo) - geography
+l'histoire - history
+l'histoire ancienne - ancient history
+l'informatique - IT / computing
+l'instruction religieuse - RE
+la menuiserie - woodwork
+la musique - music
+les mathématiques (maths) - maths
+les mathématiques approfondies - applied maths
+la philosophie (la philo) - philosophy
+les sciences de la vie et de la terre (SVT) - biology / geology
+la littérature - literature
+la grammaire - grammar
+l'orthographe (f.) - spelling
+les langues vivantes - modern languages
+
+## 43. School Rules & Sanctions (Le règlement)
+
+### À l'école il faut... (At school you must)
+respecter les profs et les autres élèves - respect teachers and other students
+arriver à l'heure - arrive on time
+faire ses devoirs - do homework
+porter un uniforme convenable - wear a proper uniform
+être attentif/attentive en classe - be attentive in class
+
+### Il est interdit de... (It is forbidden to)
+avoir un portable en classe - have a phone in class
+porter du maquillage - wear makeup
+porter beaucoup de bijoux - wear lots of jewelry
+fumer à l'intérieur du bâtiment - smoke inside the building
+faire des graffitis - do graffiti
+
+### Les sanctions
+recevoir une retenue - receive a detention
+être collé(e) le vendredi après-midi - to be in detention on Friday afternoon
+recevoir un avertissement - receive a warning
+être renvoyé(e) par le proviseur - be expelled by the principal
+être expulsé(e) de l'école - be expelled from school
+
+### Phrases idiomatiques (Rules)
+Les règles mettent de l’ordre dans le chaos. - Rules bring order to chaos.
+C’est tolérance zéro à notre école. - Our school has zero tolerance.
+Un peu de discipline ne fait pas de mal. - A little discipline doesn’t hurt.
+Les règles scolaires sont un mal nécessaire. - School rules are a necessary evil.
+
+## 44. The Future & Careers (L’avenir)
+
+### Aller à l'université (University)
+le commerce - business
+la science - science
+les lettres - arts / humanities
+la médecine - medicine
+l'informatique - IT
+la psychologie - psychology
+l'architecture - architecture
+l'ingénierie - engineering
+le droit - law
+les études d'infirmière - nursing studies
+les langues étrangères - foreign languages
+le journalisme - journalism
+
+### Trouver un emploi (Careers)
+architecte - architect
+ingénieur(e) - engineer
+scientifique - scientist
+professeur(e) - teacher
+journaliste - journalist
+écrivain(e) - writer
+musicien(ne) - musician
+traducteur(trice) - translator
+graphiste - graphic designer
+avocat(e) - lawyer
+notaire - solicitor / notary
+informaticien(ne) - IT professional
+développeur d'applications - app developer
+médecin - doctor
+dentiste - dentist
+vétérinaire - vet
+infirmier(ère) - nurse
+kinésithérapeute - physiotherapist
+pharmacien(ne) - pharmacist
+psychologue - psychologist
+comptable - accountant
+chef(fe) d'entreprise - business owner / boss
+homme / femme d'affaires - businessman / woman
+policier(ère) - police officer
+
+### Travailler comme...
+coiffeur / coiffeuse dans un salon - hairdresser in a salon
+fonctionnaire dans un bureau - civil servant in an office
+assistant(e) dans une banque - assistant in a bank
+vendeur / vendeuse dans un magasin - shop assistant
+mécanicien(ne) dans un garage - mechanic in a garage
+apprenti(e) électricien(ne) - apprentice electrician
+
+### Prendre une année sabbatique
+faire le tour du monde - travel around the world
+faire un stage en entreprise - do an internship in a company
+se reposer un peu - rest a bit
+travailler comme bénévole - work as a volunteer
+
+## 45. Gender Equality (L'égalité homme-femme)
+être égal(e) à - to be equal to
+des inégalités - inequalities
+c’est scandaleux ! - it’s scandalous!
+la condition de la femme - the position of women
+le mouvement féministe - the feminist movement
+l’émancipation des femmes - female emancipation
+le harcèlement sexuel - sexual harassment
+la violence conjugale - domestic violence
+obtenir les mêmes droits - to obtain the same rights
+lutter contre les stéréotypes - to fight against stereotypes
+
+## 46. Writing an Opinion Piece (Écrire un texte d'opinion)
+
+### Introduire le sujet (Introduce the subject)
+Ce sujet m’intéresse beaucoup parce que... - I’m very interested in this subject because ...
+Je suis tout à fait d’accord avec cette affirmation - I completely agree with this statement
+Je ne suis pas d’accord avec cette affirmation - I do not agree with this statement
+De nos jours, il est vrai que... - Nowadays, it is true that ...
+La société moderne est préoccupée par ce problème - Modern society is preoccupied with this problem
+C’est un sujet brûlant en ce moment - It is a hot topic at the moment
+
+### Structurer votre argument (Structure your argument)
+Tout d’abord... - First of all, ...
+Pour commencer... - To start with, ...
+Deuxièmement... - Secondly, ...
+Ensuite... - Then ...
+De plus... - Moreover ...
+Je crois que d’un côté... - I think that on the one hand ...
+D’un autre côté... - On the other hand ...
+Il va sans dire que... - It goes without saying that ...
+Il est évident que... - It is obvious that ...
+En revanche... - However ...
+
+### Exprimer votre opinion (Express your opinion)
+À mon avis... - In my opinion ...
+Je crois que... - I believe that ...
+Je pense que... - I think that ...
+Je trouve que... - I find that ...
+Je suis tout à fait d’accord que... - I completely agree that ...
+Tout le monde pense que... - Everyone thinks that ...
+Il ne faut pas oublier que... - One should not forget that ...
+
+### Donner des exemples et résoudre le problème
+Par exemple... - For example ...
+Ajoutons à cela... - Add to that ...
+Prenons par exemple... - Take for example ...
+On devrait... - One (we) should ...
+On pourrait... - One (we) could ...
+Si j’étais ministre de l’Environnement, je changerais... - If I was the Minister for the Environment, I would change ...
+
+### Conclure (Conclude)
+En conclusion, j’avoue que... - In conclusion, I admit that ...
+Pour résumer... - To summarise ...
+Pour finir... - To finish ...
+
+## 47. Writing an Account (Écrire un compte rendu)
+
+### Openings (Near past & memory)
+Je viens de + infinitif - I have just + infinitive of verb
+Je me souviens de... - I remember ...
+Je me rappelle... - I recall ...
+Une fois je suis allé(e)... - One time I went ...
+Il y a quelques mois / années... - A few months / years ago ...
+
+### Events
+Je suis allé(e) à... - I went to ...
+On est allé... - We went ...
+Je suis arrivé(e)... - I arrived ...
+On est resté... - We stayed ...
+
+### Emotions/Descriptions
+C’était magnifique - It was magnificent.
+J’étais heureux / heureuse / ravi(e) - I was happy / delighted.
+J’étais triste / déçu(e) - I was sad / disappointed.
+Il faisait beau et chaud - The weather was nice and warm.
+
+### Descriptive phrases
+Sans aucun doute, c’était le plus beau jour de ma vie ! - Without a doubt, it was the best day of my life!
+C’était une expérience qui resterait gravée dans ma mémoire pour toujours - It was an experience that would remain etched in my memory forever.
+
+## 48. Reading Comprehension Phrases (Les questions de lecture)
+Le narrateur / La narratrice - Narrator
+L'auteur - Author
+D'après / Selon l'auteur... - According to the author...
+Dans la première section - In the first section
+(deuxième/troisième/quatrième) - (second/third/fourth)
+Citez une expression - Quote a phrase
+Relevez le mot qui montre / indique... - Pick out the word which shows...
+Citez la phrase qui montre / indique... - Quote the sentence which shows...
+Trouvez une phrase / expression qui veut dire... - Find a sentence/expression which means...
+Trouvez dans le texte... - Find in the text...
+Trouvez un synonyme de... - Find a synonym (similar word) for...
+Relevez le mot auquel le pronom en italique se réfère - Pick out the word to which the pronoun in italics refers
+Trouvez le substantif auquel se réfère le pronom « le » - Find the noun to which 'le' refers
+Expliquez pourquoi - Explain why
+Comment le savons-nous ? - How do we know?
+Cochez la bonne case - Tick the correct box
+
+## 49. Verbs & Grammar
+
+### Reflexive Verbs (Verbes Pronominaux)
+S'appeler - To call oneself
+Se coucher - To go to bed
+Se fâcher - To get angry
+S'habiller - To get dressed
+Se laver - To wash oneself
+Se lever - To get up
+Se reposer - To rest
+Se réveiller - To wake up
+Se souvenir de - To remember
+
+### Adjectives (General)
+Beau - Beautiful
+Bon - Good
+Dernier - Last
+Faible - Weak
+Grand - Tall / Big
+Gros - Big / Fat
+Joli - Nice / Pretty
+Long - Long
+Mauvais - Bad
+Méchant - Nasty / Mean
+Nouveau - New
+Petit - Small
+Premier - First
+Vaste - Large
+Vieux - Old
+Vilain - Naughty
+
+### Questioning Words (Mots Interrogatifs)
+Quand ? - When?
+Pourquoi ? - Why?
+Combien ? - How much/many?
+Comment ? - How?
+Que... ? - What...?
+Quoi ? - What?
+Qui ? - Who?
+Où ? - Where?
+
+### Negative Phrases (Les Négations)
+Ne... aucun(e) - No / none / not any
+Ne... pas encore - Not yet
+Ne... jamais - Never
+Ne... ni... ni... - Neither... nor
+Ne... nulle part - Nowhere
+Ne... pas toujours - Not always
+Ne... personne - Nobody
+Ne... plus - No more / no longer
+Ne... que - Only
+Ne... rien - Nothing
+
+## 50. Verbs & Prepositions
+
+### Verbs with Prepositions (Verbes + à)
+demander à - to ask (someone)
+jouer à - to play (a sport)
+obéir à - to obey (someone)
+penser à - to think about
+rappeler à - to remind
+répondre à - to answer
+s'intéresser à - to be interested in
+téléphoner à - to telephone
+aider à - to help (to)
+apprendre à - to learn to
+commencer à - to begin to
+continuer à - to continue to
+inviter à - to invite to
+obliger à - to oblige to
+penser à - to think of (doing)
+réussir à - to succeed in
+s'habituer à - to get used to
+
+### Verbs with Prepositions (Verbes + de)
+avoir besoin de - to need
+avoir envie de - to want
+avoir honte de - to be ashamed of
+avoir peur de - to be frightened of
+jouer de - to play (an instrument)
+se souvenir de - to remember
+s'occuper de - to look after
+sortir de - to go out of / leave
+arrêter de - to stop
+décider de - to decide to
+empêcher de - to prevent from
+essayer de - to try to
+éviter de - to avoid
+oublier de - to forget to
+refuser de - to refuse to
+tenter de - to attempt to
+
+### Expressions with Prepositions (Expressions + de)
+à côté de - next to
+à cause de - because of
+à propos de - about/concerning
+au bord de - on the edge of
+au milieu de - in the middle of
+au sujet de - on the subject of
+autour de - around
+en face de - opposite
+loin de - far from
+près de - near to
+`;
+
+        // 4. Parsing Logic
+        function parseVocabData(markdown) {
+            const lines = markdown.split('\n');
+            const categories = [];
+            let currentCategory = null;
+            let currentSubcategory = null;
+
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) return;
+
+                if (trimmedLine.startsWith('## ')) {
+                    currentCategory = {
+                        title: trimmedLine.replace('## ', ''),
+                        subcategories: []
+                    };
+                    categories.push(currentCategory);
+                    currentSubcategory = null;
+                } else if (trimmedLine.startsWith('### ')) {
+                    if (currentCategory) {
+                        currentSubcategory = {
+                            title: trimmedLine.replace('### ', ''),
+                            words: []
+                        };
+                        currentCategory.subcategories.push(currentSubcategory);
+                    }
+                } else if (trimmedLine.includes(' - ')) {
+                    if (currentSubcategory) {
+                        const [french, english] = trimmedLine.split(' - ').map(s => s.trim());
+                        const id = btoa(unescape(encodeURIComponent(french + english))).replace(/[^a-zA-Z0-9]/g, '');
+                        currentSubcategory.words.push({ id, french, english });
+                    }
+                }
+            });
+            return categories;
+        }
+
+        // 5. Components & Icons (Using Emojis to keep it simple)
+        const Icons = {
+            Book: () => <span>📚</span>,
+            Check: () => <span>✅</span>,
+            ChevronLeft: () => <span>⬅️</span>,
+            Brain: () => <span>🧠</span>,
+            GraduationCap: () => <span>🎓</span>,
+            X: () => <span>❌</span>,
+            RotateCcw: () => <span>🔄</span>,
+            Layers: () => <span>📑</span>,
+            Search: () => <span>🔍</span>,
+            Volume2: () => <span>🔊</span>
+        };
+
+        function ProgressBar({ current, total, colorClass = "bg-blue-500" }) {
+            const percentage = Math.round((current / total) * 100) || 0;
+            return (
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div className={`h-2.5 rounded-full ${colorClass}`} style={{ width: `${percentage}%` }}></div>
+                </div>
+            );
+        }
+
+        function Dashboard({ categories, knownWords, setView, setActiveCategory }) {
+            const totalWords = useMemo(() => {
+                return categories.reduce((acc, cat) => 
+                    acc + cat.subcategories.reduce((subAcc, sub) => subAcc + sub.words.length, 0)
+                , 0);
+            }, [categories]);
+
+            const totalKnown = knownWords.size;
+
+            return (
+                <div className="p-6 max-w-6xl mx-auto">
+                    <header className="mb-8 text-center">
+                        <h1 className="text-4xl font-bold text-slate-800 mb-2">French Vocab Master</h1>
+                        <p className="text-slate-500">Your personal vocabulary companion</p>
+                        
+                        <div className="mt-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-md mx-auto">
+                            <div className="flex justify-between items-end mb-2">
+                                <span className="text-sm font-medium text-slate-500">Total Mastery</span>
+                                <span className="text-2xl font-bold text-blue-600">{Math.round((totalKnown/totalWords)*100)}%</span>
+                            </div>
+                            <ProgressBar current={totalKnown} total={totalWords} />
+                            <div className="mt-2 text-xs text-slate-400 text-right">{totalKnown} / {totalWords} words learned</div>
+                        </div>
+                    </header>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {categories.map((cat, idx) => {
+                            const catWords = cat.subcategories.flatMap(s => s.words);
+                            const catKnown = catWords.filter(w => knownWords.has(w.id)).length;
+                            const isComplete = catKnown === catWords.length && catWords.length > 0;
+
+                            return (
+                                <div key={idx} 
+                                     onClick={() => { setActiveCategory(cat); setView('category'); }}
+                                     className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-200 transition-all cursor-pointer group">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="bg-blue-50 p-3 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            {isComplete ? <Icons.GraduationCap /> : <Icons.Book />}
+                                        </div>
+                                        {isComplete && <span className="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full">Completed</span>}
+                                    </div>
+                                    <h3 className="font-semibold text-lg text-slate-800 mb-2 line-clamp-1" title={cat.title}>{cat.title.replace(/^\d+\.\s*/, '')}</h3>
+                                    <p className="text-sm text-slate-500 mb-4">{cat.subcategories.length} Topics • {catWords.length} Words</p>
+                                    <ProgressBar current={catKnown} total={catWords.length} />
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        }
+
+        const playAudio = (text) => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Sorry, your browser doesn't support text-to-speech.");
+            }
+        };
+
+        function CategoryView({ category, knownWords, toggleKnown, setView }) {
+            const [activeSubTab, setActiveSubTab] = useState('all');
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const filteredWords = useMemo(() => {
+                let words = [];
+                if (activeSubTab === 'all') {
+                    words = category.subcategories.flatMap(s => s.words);
+                } else {
+                    const sub = category.subcategories.find(s => s.title === activeSubTab);
+                    words = sub ? sub.words : [];
+                }
+                
+                if (searchTerm) {
+                    const lower = searchTerm.toLowerCase();
+                    words = words.filter(w => w.french.toLowerCase().includes(lower) || w.english.toLowerCase().includes(lower));
+                }
+                return words;
+            }, [category, activeSubTab, searchTerm]);
+
+            return (
+                <div className="flex flex-col h-screen max-w-5xl mx-auto bg-white shadow-xl overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 bg-white z-10">
+                        <button onClick={() => setView('dashboard')} className="flex items-center text-slate-500 hover:text-blue-600 mb-4 transition-colors">
+                            <span className="mr-1"><Icons.ChevronLeft /></span> <span className="font-medium">Back to Dashboard</span>
+                        </button>
+                        <div className="flex justify-between items-center flex-wrap gap-4">
+                            <h2 className="text-2xl font-bold text-slate-800">{category.title.replace(/^\d+\.\s*/, '')}</h2>
+                            <button onClick={() => setView('flashcards')} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium flex items-center transition-all shadow-sm hover:shadow-md">
+                                <span className="mr-2"><Icons.Layers /></span> Practice Flashcards
+                            </button>
+                        </div>
+                        
+                        <div className="mt-6 flex overflow-x-auto gap-2 pb-2 no-scrollbar">
+                            <button 
+                                onClick={() => setActiveSubTab('all')}
+                                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeSubTab === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                            >
+                                All Words
+                            </button>
+                            {category.subcategories.map((sub, idx) => (
+                                <button 
+                                    key={idx}
+                                    onClick={() => setActiveSubTab(sub.title)}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeSubTab === sub.title ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                                >
+                                    {sub.title}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="mt-4 relative">
+                            <input 
+                                type="text" 
+                                placeholder="Search in this category..." 
+                                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <div className="absolute left-3 top-2.5 text-slate-400">
+                                <Icons.Search />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                            {filteredWords.length > 0 ? (
+                                filteredWords.map((word, idx) => (
+                                    <div key={idx} 
+                                         className={`flex items-center justify-between p-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors cursor-pointer ${knownWords.has(word.id) ? 'bg-green-50/50' : ''}`}
+                                         onClick={() => toggleKnown(word.id)}
+                                    >
+                                        <div className="flex-1 pr-4 flex items-center gap-3">
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    playAudio(word.french);
+                                                }}
+                                                className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition-colors"
+                                                title="Listen"
+                                            >
+                                                <Icons.Volume2 />
+                                            </button>
+                                            <div>
+                                                <div className="font-semibold text-slate-800 text-lg">{word.french}</div>
+                                                <div className="text-slate-500">{word.english}</div>
+                                            </div>
+                                        </div>
+                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${knownWords.has(word.id) ? 'bg-green-500 border-green-500 text-white' : 'border-slate-300 text-transparent'}`}>
+                                            <Icons.Check />
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="p-12 text-center text-slate-400">
+                                    No words found matching your filter.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function FlashcardMode({ category, knownWords, toggleKnown, setView }) {
+            const [queue, setQueue] = useState([]);
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [isFlipped, setIsFlipped] = useState(false);
+            const [filterMode, setFilterMode] = useState('all');
+
+            useEffect(() => {
+                const allWords = category.subcategories.flatMap(s => s.words);
+                let filtered = allWords;
+                if (filterMode === 'unknown') filtered = allWords.filter(w => !knownWords.has(w.id));
+                if (filterMode === 'known') filtered = allWords.filter(w => knownWords.has(w.id));
+                
+                setQueue(filtered.sort(() => Math.random() - 0.5));
+                setCurrentIndex(0);
+                setIsFlipped(false);
+            }, [category, filterMode]);
+
+            const currentWord = queue[currentIndex];
+
+            const handleNext = () => {
+                setIsFlipped(false);
+                setTimeout(() => {
+                    setCurrentIndex((prev) => (prev + 1) % queue.length);
+                }, 150);
+            };
+
+            if (!currentWord) return (
+                <div className="h-screen flex flex-col items-center justify-center p-6 text-center">
+                    <h3 className="text-xl font-semibold mb-4">No cards to show!</h3>
+                    <p className="text-slate-500 mb-6">You might have filtered out all words.</p>
+                    <button onClick={() => setView('category')} className="text-blue-600 font-medium">Go Back</button>
+                </div>
+            );
+
+            const markAndNext = (isKnown) => {
+                if (isKnown && !knownWords.has(currentWord.id)) toggleKnown(currentWord.id);
+                if (!isKnown && knownWords.has(currentWord.id)) toggleKnown(currentWord.id);
+                handleNext();
+            };
+
+            return (
+                <div className="h-screen flex flex-col bg-slate-100">
+                    <div className="p-4 flex justify-between items-center bg-white shadow-sm">
+                        <button onClick={() => setView('category')} className="text-slate-500 hover:text-slate-800"><Icons.X /></button>
+                        <div className="flex space-x-2">
+                            {['all', 'unknown'].map(mode => (
+                                <button 
+                                    key={mode}
+                                    onClick={() => setFilterMode(mode)}
+                                    className={`px-3 py-1 text-xs rounded-full uppercase font-bold tracking-wider ${filterMode === mode ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'}`}
+                                >
+                                    {mode}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="text-sm font-medium text-slate-500">{currentIndex + 1} / {queue.length}</div>
+                    </div>
+
+                    <div className="flex-1 flex flex-col items-center justify-center p-6">
+                        <div 
+                            className={`w-full max-w-md aspect-[4/3] cursor-pointer perspective-1000 group relative`}
+                            onClick={() => setIsFlipped(!isFlipped)}
+                        >
+                            <div className={`relative w-full h-full text-center transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
+                                {/* Front */}
+                                <div className="absolute w-full h-full backface-hidden bg-white rounded-2xl shadow-xl border border-slate-200 flex flex-col items-center justify-center p-8">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <span className="text-xs text-slate-400 uppercase tracking-widest">French</span>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                playAudio(currentWord.french);
+                                            }}
+                                            className="text-slate-400 hover:text-blue-500 transition-colors p-1"
+                                            title="Listen"
+                                        >
+                                            <Icons.Volume2 />
+                                        </button>
+                                    </div>
+                                    <div className="text-3xl md:text-4xl font-bold text-slate-800 break-words w-full">{currentWord.french}</div>
+                                    <div className="mt-8 text-sm text-blue-500 font-medium">Click to flip</div>
+                                </div>
+                                {/* Back */}
+                                <div className="absolute w-full h-full backface-hidden bg-blue-50 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center justify-center p-8" style={{ transform: 'rotateY(180deg)' }}>
+                                    <div className="text-xs text-blue-400 uppercase tracking-widest mb-4">English</div>
+                                    <div className="text-2xl md:text-3xl font-medium text-slate-700 break-words w-full">{currentWord.english}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-10 flex gap-4 w-full max-w-md">
+                            <button 
+                                onClick={() => markAndNext(false)}
+                                className="flex-1 bg-white border border-red-200 text-red-600 py-3 rounded-xl font-semibold shadow-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Icons.RotateCcw /> Still Learning
+                            </button>
+                            <button 
+                                onClick={() => markAndNext(true)}
+                                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-semibold shadow-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Icons.Check /> I Know It
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [vocabData, setVocabData] = useState([]);
+            const [view, setView] = useState('dashboard');
+            const [activeCategory, setActiveCategory] = useState(null);
+            
+            const [knownWords, setKnownWords] = useState(() => {
+                const saved = localStorage.getItem('french_vocab_known');
+                return saved ? new Set(JSON.parse(saved)) : new Set();
+            });
+
+            useEffect(() => {
+                const data = parseVocabData(RAW_VOCAB_DATA);
+                setVocabData(data);
+            }, []);
+
+            useEffect(() => {
+                localStorage.setItem('french_vocab_known', JSON.stringify([...knownWords]));
+            }, [knownWords]);
+
+            const toggleKnown = (id) => {
+                const newSet = new Set(knownWords);
+                if (newSet.has(id)) {
+                    newSet.delete(id);
+                } else {
+                    newSet.add(id);
+                }
+                setKnownWords(newSet);
+            };
+
+            if (view === 'dashboard') {
+                return <Dashboard categories={vocabData} knownWords={knownWords} setView={setView} setActiveCategory={setActiveCategory} />;
+            }
+
+            if (view === 'category' && activeCategory) {
+                return <CategoryView category={activeCategory} knownWords={knownWords} toggleKnown={toggleKnown} setView={setView} />;
+            }
+
+            if (view === 'flashcards' && activeCategory) {
+                return <FlashcardMode category={activeCategory} knownWords={knownWords} toggleKnown={toggleKnown} setView={setView} />;
+            }
+
+            return <div className="p-10 text-center">Loading...</div>;
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
